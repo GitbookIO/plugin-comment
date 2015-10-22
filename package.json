@@ -1,0 +1,22 @@
+{
+    "name": "gitbook-plugin-comment",
+    "description": "Inline comments with gitbook.com",
+    "main": "index.js",
+    "version": "0.0.0",
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/GitbookIO/plugin-comment",
+    "keywords": ["math", "latex"],
+    "engines": {
+        "gitbook": ">=2.4.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GitbookIO/plugin-comment.git"
+    },
+    "bugs": {
+        "url": "https://github.com/GitbookIO/plugin-comment/issues"
+    },
+    "gitbook": {
+        "properties": {}
+    }
+}
