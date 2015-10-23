@@ -9,6 +9,10 @@
     "engines": {
         "gitbook": ">=2.4.3"
     },
+    "devDependencies": {
+        "less": "2.5.1",
+        "minifier": "0.7.1"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/GitbookIO/plugin-comment.git"
@@ -18,5 +22,8 @@
     },
     "gitbook": {
         "properties": {}
+    },
+    "scripts": {
+        "prepublish": "mkdir -p assets; lessc ./less/main.less > ./assets/plugin.css; minify ./js/main.js > ./assets/plugin.js"
     }
 }
