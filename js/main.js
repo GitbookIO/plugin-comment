@@ -1,5 +1,20 @@
 require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var allThreads = [];
+    var allComments = {};
+
+    var TPL_COMMENT = _.template(
+        '<img src="<%- user.urls.avatar %>" class="comment-avatar" />' +
+        '<div class="comment-body">' +
+            '<a href="<%- user.urls.profile %>" target="_blank" class="comment-user"><%- user.name %></a>' +
+            '<div class="comment-content"><%= body || title %></div>' +
+        '</div>');
+
+    var TPL_THREAD = _.template(
+        '<img src="<%- user.urls.avatar %>" class="thread-avatar" />' +
+        '<div class="thread-body">' +
+            '<div class="thread-title"><%= title %></div>' +
+            '<div class="thread-user">Posted by <%- user.name %></div>' +
+        '</div>');
 
     // Move content to the left
     // Calcul the right position
@@ -54,7 +69,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     }
 
     // Create a new thread on th backend
-    function postThread(subject, body, section) {
+    function postThread(subject, body, section, done) {
         $.post('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads', {
             title: subject,
             body: body,
@@ -62,8 +77,17 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 filename: gitbook.state.filepath,
                 section: section
             }
-        }, function(err, result) {
-            console.log(err, result);
+        }, function(result) {
+            done(result);
+        });
+    }
+
+    // Post a new comment
+    function postComment(id, body, done) {
+        $.post('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads/'+id+'/comments', {
+            body: body
+        }, function(result) {
+            done(result);
         });
     }
 
@@ -84,7 +108,14 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'click': function(e) {
                 e.preventDefault();
 
-                postThread($input.val(), '', $section.text());
+                postThread($input.val(), '', $section.text(), function(thread) {
+                    // Add to the list of all threads
+                    allThreads.push(thread);
+                    updateSections();
+
+                    // Update view with this thread
+                    createThreadComments($commentsArea, $section, thread);
+                });
             }
         });
 
@@ -104,38 +135,20 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         $input.focus();
     }
 
+    // Create and return a thread for listing
+    function createThread(thread) {
+        return $('<div>', {
+            'class': 'thread',
+            'html': TPL_THREAD(thread)
+        });
+    }
+
     // Create and return a comment
     function createComment(comment) {
-        var $comment = $('<div>', {
-            'class': 'comment'
+        return $('<div>', {
+            'class': 'comment',
+            'html': TPL_COMMENT(comment)
         });
-
-        var $avatar = $('<a>', {
-            'class': 'comment-avatar',
-            'html': '<img src="'+comment.user.urls.avatar+'" />'
-        });
-
-        var $username = $('<a>', {
-            'class': 'comment-user',
-            'text': comment.user.name,
-            'href': comment.user.urls.profile
-        });
-
-        var $body = $('<div>', {
-            'class': 'comment-body'
-        });
-
-        var $content = $('<div>', {
-            'class': 'comment-content',
-            'text': comment.body || comment.title
-        });
-
-        $comment.append($avatar);
-        $body.append($username);
-        $body.append($content);
-        $comment.append($body);
-
-        return $comment;
     }
 
     // Display a thread and its comments
@@ -186,16 +199,14 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Create a list of threads to select one to show
     function createThreadsList($commentsArea, $section, threads) {
-        var $threads = $('<ul>', {
+        var $threads = $('<div>', {
             'class': 'comments-threads'
         });
 
         _.each(threads, function(thread) {
-            var $thread = $('<li>', {
-                'text': thread.title,
-                'click': function(e) {
-                    createThreadComments($commentsArea, $section, thread);
-                }
+            var $thread = createThread(thread)
+            $thread.click(function(e) {
+                createThreadComments($commentsArea, $section, thread);
             });
             $threads.append($thread);
         });
