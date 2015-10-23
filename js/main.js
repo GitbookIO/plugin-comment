@@ -10,7 +10,6 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         '</div>');
 
     var TPL_THREAD = _.template(
-        '<img src="<%- user.urls.avatar %>" class="thread-avatar" />' +
         '<div class="thread-body">' +
             '<div class="thread-title"><%= title %></div>' +
             '<div class="thread-user">Posted by <%- user.name %></div>' +
@@ -47,24 +46,15 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             filename: gitbook.state.filepath
         }, function(result) {
             allThreads = result.list;
-            console.log(allThreads);
             updateSections();
         });
     }
 
-    // Return list of threads matching a section
-    function filterThreads(section) {
-        var words = section.split(' ');
-
-        return _.filter(allThreads, function(thread) {
-            var threadWords = (thread.context.section || '').split(' ');
-
-            var commonWords = _.filter(threadWords, function(word) {
-                return _.contains(words, word);
-            });
-
-            var matching = commonWords.length/threadWords.length;
-            return matching > 0.8;
+    // Fetch threads from gitbook.com and update listing
+    function fetchComments(id) {
+        $.getJSON('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads/'+id+'/comments', function(result) {
+            allComments[id] = result.list;
+            updateComments(id);
         });
     }
 
@@ -87,7 +77,30 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         $.post('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads/'+id+'/comments', {
             body: body
         }, function(result) {
+            // Prefill data
+            allComments[id] = allComments[id] || [];
+            allComments[id].push(result);
+            updateComments(id);
+
+            // Sync fetch all comments
+            fetchComments(id);
             done(result);
+        });
+    }
+
+    // Return list of threads matching a section
+    function filterThreads(section) {
+        var words = section.split(' ');
+
+        return _.filter(allThreads, function(thread) {
+            var threadWords = (thread.context.section || '').split(' ');
+
+            var commonWords = _.filter(threadWords, function(word) {
+                return _.contains(words, word);
+            });
+
+            var matching = commonWords.length/threadWords.length;
+            return matching > 0.8;
         });
     }
 
@@ -121,7 +134,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
         $toolBar.append($postButton);
 
-        var $input = $('<textarea>', {
+        var $input = $('<input>', {
+            'type': 'text',
             'placeholder': 'Start a new discussion'
         });
 
@@ -144,7 +158,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     }
 
     // Create and return a comment
-    function createComment(comment) {
+    function createComment(comment, isThread) {
         return $('<div>', {
             'class': 'comment',
             'html': TPL_COMMENT(comment)
@@ -153,6 +167,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Display a thread and its comments
     function createThreadComments($commentsArea, $section, thread) {
+        // Go fetch comments
+        fetchComments(thread.number);
 
         // Post area
         var $postArea = $('<div>', {
@@ -169,13 +185,16 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'click': function(e) {
                 e.preventDefault();
 
-                postThread($input.val(), '', $section.text());
+                postComment(thread.number, $input.val(), function() {
+                    $input.val('');
+                });
             }
         });
 
         $toolBar.append($postButton);
 
-        var $input = $('<textarea>', {
+        var $input = $('<input>', {
+            'type': 'text',
             'placeholder': 'Leave a comment'
         });
         $postArea.append($input);
@@ -183,18 +202,18 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
 
         var $comments = $('<div>', {
-            'class': 'comments-list'
+            'class': 'comments-list',
+            'data-thcomments': thread.number
         });
 
-        $comments.append(createComment(thread));
-
-
-
         $commentsArea.html('');
+        $commentsArea.append(createComment(thread));
         $commentsArea.append($comments);
         $commentsArea.append($postArea);
 
         $input.focus();
+
+        updateComments(thread.number);
     }
 
     // Create a list of threads to select one to show
@@ -298,6 +317,20 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
         $sections.each(function() {
             bindSection($(this));
+        });
+    }
+
+    // Update comments for a thread
+    function updateComments(number) {
+        if (!allComments[number]) return;
+
+        var $list = gitbook.state.$book.find('.page-wrapper div[data-thcomments="'+number+'"]');
+        if ($list.length == 0) return;
+
+        $list.html('');
+
+        _.each(allComments[number] || [], function(comment) {
+            $list.append(createComment(comment));
         });
     }
 

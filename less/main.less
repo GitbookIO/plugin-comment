@@ -11,6 +11,8 @@
 @comment-color: #666;
 @comment-font-size: 12px;
 
+@highlight-background: linear-gradient(to bottom, rgba(39, 243, 106, 0.1), rgba(39, 243, 106, 0.1));
+
 .book .book-body .page-wrapper {
     .page-inner {
         position: relative;
@@ -59,57 +61,45 @@
             top: 0px;
             font-size: @comment-font-size;
 
-            textarea {
+            input {
                 width: 100%;
                 resize: none;
                 outline: none;
                 border: none;
             }
 
+            .comments-toolbar {
+                margin-top: @comment-padding-v;
+            }
+
             // List of threads
             .comments-threads {
                 margin-bottom: 15px;
 
-                .thread {
-                    padding: 0px;
-                    padding-bottom: @comment-padding-v;
-                    margin-bottom: @comment-padding-v;
-                    border-bottom: 1px solid @border-color;
-                    cursor: pointer;
+            }
 
-                    &:hover {
-                        .thread-body {
-                            .thread-title {
-                                text-decoration: underline;
-                            }
-                        }
-                    }
+            .thread {
+                padding: 0px;
+                padding-bottom: @comment-padding-v;
+                margin-bottom: @comment-padding-v;
+                border-bottom: 1px solid @border-color;
+                cursor: pointer;
 
-                    .thread-avatar {
-                        margin-top: 4px;
-                        width: @avatar-size;
-                        height: @avatar-size;
-                        display: block;
-                        overflow: hidden;
-                        border-radius: @avatar-size;
-                        float: left;
-
-                        img {
-                            width: 100%;
-                            height: 100%;
-                        }
-                    }
-
+                &:hover {
                     .thread-body {
-                        margin-left: @avatar-size + @comment-padding-v;
-
-                        .thread-user {
-                            color: @comment-color;
-                        }
-
                         .thread-title {
-                            font-weight: bold;
+                            text-decoration: underline;
                         }
+                    }
+                }
+
+                .thread-body {
+                    .thread-user {
+                        color: @comment-color;
+                    }
+
+                    .thread-title {
+                        font-weight: bold;
                     }
                 }
             }
@@ -117,39 +107,39 @@
             // List of comments in a thread
             .comments-list {
                 margin-bottom: 15px;
+            }
 
-                .comment {
-                    padding: 0px;
-                    padding-bottom: @comment-padding-v;
-                    margin-bottom: @comment-padding-v;
-                    border-bottom: 1px solid @border-color;
+            .comment {
+                padding: 0px;
+                padding-bottom: @comment-padding-v;
+                margin-bottom: @comment-padding-v;
+                border-bottom: 1px solid @border-color;
 
-                    .comment-avatar {
-                        margin-top: 4px;
-                        width: @avatar-size;
-                        height: @avatar-size;
-                        display: block;
-                        overflow: hidden;
-                        border-radius: @avatar-size;
-                        float: left;
+                .comment-avatar {
+                    margin-top: 4px;
+                    width: @avatar-size;
+                    height: @avatar-size;
+                    display: block;
+                    overflow: hidden;
+                    border-radius: @avatar-size;
+                    float: left;
 
-                        img {
-                            width: 100%;
-                            height: 100%;
-                        }
+                    img {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+
+                .comment-body {
+                    margin-left: @avatar-size + @comment-padding-v;
+
+                    .comment-user {
+                        font-weight: bold;
+                        color: inherit;
                     }
 
-                    .comment-body {
-                        margin-left: @avatar-size + @comment-padding-v;
-
-                        .comment-user {
-                            font-weight: bold;
-                            color: inherit;
-                        }
-
-                        .comment-content {
-                            color: @comment-color;
-                        }
+                    .comment-content {
+                        color: @comment-color;
                     }
                 }
             }
@@ -162,8 +152,14 @@
         }
 
         &.has-comments-open {
+            background-image: @highlight-background;
+
             .comments-icon {
                 display: block;
+
+                .marker {
+                    background-image: @highlight-background;
+                }
             }
 
             .comments-area {
