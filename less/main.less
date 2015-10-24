@@ -3,12 +3,12 @@
 @comments-icon-margin: 20px;
 @comments-column-width: (2*@comments-icon-margin + @comments-icon-width + @comments-area-width);
 
-@border-color: #eee;
+@border-color: rgba(0, 0, 0, 0.1);
 
 @avatar-size: 24px;
 
 @comment-padding-v: 6px;
-@comment-color: #666;
+@comment-body-opacity: 0.8;
 @comment-font-size: 12px;
 
 @highlight-background: linear-gradient(to bottom, rgba(39, 243, 106, 0.1), rgba(39, 243, 106, 0.1));
@@ -46,6 +46,7 @@
                 line-height: (@comments-icon-width - 8);
                 text-align: center;
                 border-radius: 3px;
+                color: #555;
 
                 &:hover {
                     background: #ddd;
@@ -66,6 +67,8 @@
                 resize: none;
                 outline: none;
                 border: none;
+                background: transparent;
+                color: inherit;
             }
 
             .comments-toolbar {
@@ -73,7 +76,7 @@
 
                 a {
                     display: inline-block;
-                    margin-right: @comment-padding-v;
+                    margin-right: 2*@comment-padding-v;
                 }
             }
 
@@ -100,7 +103,7 @@
 
                 .thread-body {
                     .thread-user {
-                        color: @comment-color;
+                        opacity: @comment-body-opacity;
                     }
 
                     .thread-title {
@@ -144,7 +147,7 @@
                     }
 
                     .comment-content {
-                        color: @comment-color;
+                        opacity: @comment-body-opacity;
                     }
                 }
             }
