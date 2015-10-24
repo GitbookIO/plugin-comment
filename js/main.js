@@ -1,6 +1,7 @@
 require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var allThreads = [];
     var allComments = {};
+    var isLoggedin = false;
 
     var SECTIONS_SELECTOR = 'p';
 
@@ -42,10 +43,32 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         }
     }
 
+    // Redirect user to login page
+    function redirectToLogin() {
+        location.href = 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/login';
+    }
+
+    // Make an api request
+    function apiRequest(method, route, data, success) {
+        $.ajax({
+            method: method,
+            dataType: 'json',
+            url: 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+route,
+            data: data,
+            success: function(result, status, xhr) {
+                isLoggedin = !!xhr.getResponseHeader('X-GitBook-Auth');
+                success(result);
+            },
+            error: function(xhr, textStatus) {
+                alert('Error with comments: '+textStatus);
+            }
+        });
+    }
+
     // Fetch threads from gitbook.com and update listing
     function fetchThreads() {
-        $.getJSON('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads', {
-            filename: gitbook.state.filepath
+        apiRequest('GET', 'comments/threads', {
+            'filename': gitbook.state.filepath
         }, function(result) {
             allThreads = result.list;
             updateSections();
@@ -54,7 +77,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Fetch threads from gitbook.com and update listing
     function fetchComments(id) {
-        $.getJSON('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads/'+id+'/comments', function(result) {
+        apiRequest('GET', 'comments/threads/'+id+'/comments', {}, function(result) {
             allComments[id] = result.list;
             updateComments(id);
         });
@@ -62,21 +85,19 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Create a new thread on th backend
     function postThread(subject, body, section, done) {
-        $.post('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads', {
+        apiRequest('GET', 'comments/threads', {
             title: subject,
             body: body,
             context: {
                 filename: gitbook.state.filepath,
                 section: section
             }
-        }, function(result) {
-            done(result);
-        });
+        }, done);
     }
 
     // Post a new comment
     function postComment(id, body, done) {
-        $.post('http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/comments/threads/'+id+'/comments', {
+        apiRequest('GET', 'comments/threads/'+id+'/comments', {
             body: body
         }, function(result) {
             // Prefill data
@@ -118,7 +139,6 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             .filter(function(r) {
                 return r.matching > 0.8;
             })
-            .tap(console.log.bind(console))
             .sortBy('matching')
             .pluck('thread')
             .value();
@@ -131,34 +151,44 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-post'
         });
 
-        var $input = $('<input>', {
-            'type': 'text',
-            'placeholder': 'Start a new discussion'
-        });
+        if (isLoggedin) {
+            var $input = $('<input>', {
+                'type': 'text',
+                'placeholder': 'Start a new discussion'
+            });
 
-        var $toolbar = createToolbar([
-            {
-                text: 'Post',
-                click: function() {
-                    postThread($input.val(), '', $section.text(), function(thread) {
-                        // Add to the list of all threads
-                        allThreads.push(thread);
-                        updateSections();
+            var $toolbar = createToolbar([
+                {
+                    text: 'Post',
+                    click: function() {
+                        postThread($input.val(), '', $section.text(), function(thread) {
+                            // Add to the list of all threads
+                            allThreads.push(thread);
+                            updateSections();
 
-                        // Update view with this thread
-                        createThreadComments($commentsArea, $section, thread);
-                    });
+                            // Update view with this thread
+                            createThreadComments($commentsArea, $section, thread);
+                        });
+                    }
                 }
-            }
-        ]);
+            ]);
 
-        $postArea.append($input);
-        $postArea.append($toolbar);
+            $postArea.append($input);
+            $postArea.append($toolbar);
+
+            $input.focus();
+        } else {
+            var $toolbar = createToolbar([
+                {
+                    text: 'Sign in to comment',
+                    click: redirectToLogin
+                }
+            ]);
+            $postArea.append($toolbar);
+        }
 
         $commentsArea.html('');
         $commentsArea.append($postArea);
-
-        $input.focus();
     }
 
     // Create and return a thread for listing
@@ -230,27 +260,37 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         // Go fetch comments
         fetchComments(thread.number);
 
-        // Post area
+        var $toolbar;
+
+        if (isLoggedin) {
+            $toolbar = createToolbar([
+                {
+                    text: 'Comment',
+                    click: function() {
+                        createThreadCommentForm($postArea, thread);
+                    }
+                },
+                {
+                    text: 'New Thread',
+                    click: function() {
+                        createThreadCreation($commentsArea, $section);
+                    }
+                }
+            ]);
+        } else {
+            $toolbar = createToolbar([
+                {
+                    text: 'Sign in to comment',
+                    click: redirectToLogin
+                }
+            ]);
+        }
+
         var $postArea = $('<div>', {
             'class': 'comments-post'
         });
-
-        var $toolbar = createToolbar([
-            {
-                text: 'Comment',
-                click: function() {
-                    createThreadCommentForm($postArea, thread);
-                }
-            },
-            {
-                text: 'New Thread',
-                click: function() {
-                    createThreadCreation($commentsArea, $section);
-                }
-            }
-        ]);
-
         $postArea.append($toolbar);
+
 
         var $comments = $('<div>', {
             'class': 'comments-list',
@@ -261,8 +301,6 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         $commentsArea.append(createComment(thread));
         $commentsArea.append($comments);
         $commentsArea.append($postArea);
-
-        $input.focus();
 
         updateComments(thread.number);
     }
@@ -281,14 +319,25 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             $threads.append($thread);
         });
 
-        var $toolbar = createToolbar([
-            {
-                text: 'New Thread',
-                click: function() {
-                    createThreadCreation($commentsArea, $section);
+        var $toolbar;
+
+        if (isLoggedin) {
+            $toolbar = createToolbar([
+                {
+                    text: 'New Thread',
+                    click: function() {
+                        createThreadCreation($commentsArea, $section);
+                    }
                 }
-            }
-        ]);
+            ]);
+        } else {
+            $toolbar = createToolbar([
+                {
+                    text: 'Sign in to create a thread',
+                    click: redirectToLogin
+                }
+            ]);
+        }
 
         $commentsArea.html('');
         $commentsArea.append($threads);
