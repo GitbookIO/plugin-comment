@@ -2,6 +2,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var allThreads = [];
     var allComments = {};
 
+    var SECTIONS_SELECTOR = 'p';
+
     var TPL_COMMENT = _.template(
         '<img src="<%- user.urls.avatar %>" class="comment-avatar" />' +
         '<div class="comment-body">' +
@@ -92,16 +94,34 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function filterThreads(section) {
         var words = section.split(' ');
 
-        return _.filter(allThreads, function(thread) {
-            var threadWords = (thread.context.section || '').split(' ');
+        return _.chain(allThreads)
+            .map(function(thread) {
+                var threadWords = (thread.context.section || '').split(' ');
 
-            var commonWords = _.filter(threadWords, function(word) {
-                return _.contains(words, word);
-            });
+                var commonWordsWithSection = _.filter(threadWords, function(word) {
+                    return _.contains(words, word);
+                });
+                var commonWordsFromSection = _.filter(words, function(word) {
+                    return _.contains(threadWords, word);
+                });
 
-            var matching = commonWords.length/threadWords.length;
-            return matching > 0.8;
-        });
+                var matching = (
+                    (commonWordsWithSection.length/threadWords.length)
+                    + (commonWordsFromSection.length/words.length)
+                ) / 2;
+
+                return {
+                    matching: matching,
+                    thread: thread
+                };
+            })
+            .filter(function(r) {
+                return r.matching > 0.8;
+            })
+            .tap(console.log.bind(console))
+            .sortBy('matching')
+            .pluck('thread')
+            .value();
     }
 
     // Create form to create thread
@@ -335,7 +355,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Update all comments sections
     function updateSections() {
         var $wrapper = gitbook.state.$book.find('.page-wrapper');
-        var $sections = $wrapper.find('p');
+        var $sections = $wrapper.find(SECTIONS_SELECTOR);
 
         $sections.each(function() {
             bindSection($(this));
