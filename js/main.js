@@ -153,12 +153,13 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Create form to create thread
     function createThreadCreation($commentsArea, $section) {
         // Post area
+        var $input;
         var $postArea = $('<div>', {
             'class': 'comments-post'
         });
 
         if (isLoggedin) {
-            var $input = $('<input>', {
+            $input = $('<input>', {
                 'type': 'text',
                 'placeholder': 'Start a new discussion'
             });
@@ -181,8 +182,6 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
             $postArea.append($input);
             $postArea.append($toolbar);
-
-            $input.focus();
         } else {
             var $toolbar = createToolbar([
                 {
@@ -195,6 +194,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
         $commentsArea.html('');
         $commentsArea.append($postArea);
+
+        if ($input) $input.focus();
     }
 
     // Create and return a thread for listing
