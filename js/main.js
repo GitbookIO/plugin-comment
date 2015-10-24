@@ -91,7 +91,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Create a new thread on th backend
     function postThread(subject, body, section, done) {
-        apiRequest('GET', 'comments/threads', {
+        apiRequest('POST', 'comments/threads', {
             title: subject,
             body: body,
             context: {
@@ -103,7 +103,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Post a new comment
     function postComment(id, body, done) {
-        apiRequest('GET', 'comments/threads/'+id+'/comments', {
+        apiRequest('POST', 'comments/threads/'+id+'/comments', {
             body: body
         }, function(result) {
             // Prefill data
