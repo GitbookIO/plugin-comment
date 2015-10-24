@@ -12,7 +12,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var TPL_THREAD = _.template(
         '<div class="thread-body">' +
             '<div class="thread-title"><%= title %></div>' +
-            '<div class="thread-user">Posted by <%- user.name %></div>' +
+            '<div class="thread-user">#<%- number %> posted by <%- user.name %></div>' +
         '</div>');
 
     // Move content to the left
@@ -26,7 +26,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         if (!$wrapper.hasClass('comments-open')) {
             $inner.css('left', 'auto');
         } else {
-            var commentsWidth = 300;
+            var commentsWidth = 330;
             var innerWidth = $inner.width();
             var wrapperWidth = $wrapper.width();
             var navWidth = $nextNavigation.length == 0? 0 : $nextNavigation.width();
@@ -111,37 +111,29 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-post'
         });
 
-        var $toolBar = $('<div>', {
-            'class': 'comments-toolbar'
-        });
-
-        var $postButton = $('<a>', {
-            'href': '#',
-            'text': 'Post',
-            'click': function(e) {
-                e.preventDefault();
-
-                postThread($input.val(), '', $section.text(), function(thread) {
-                    // Add to the list of all threads
-                    allThreads.push(thread);
-                    updateSections();
-
-                    // Update view with this thread
-                    createThreadComments($commentsArea, $section, thread);
-                });
-            }
-        });
-
-        $toolBar.append($postButton);
-
         var $input = $('<input>', {
             'type': 'text',
             'placeholder': 'Start a new discussion'
         });
 
+        var $toolbar = createToolbar([
+            {
+                text: 'Post',
+                click: function() {
+                    postThread($input.val(), '', $section.text(), function(thread) {
+                        // Add to the list of all threads
+                        allThreads.push(thread);
+                        updateSections();
+
+                        // Update view with this thread
+                        createThreadComments($commentsArea, $section, thread);
+                    });
+                }
+            }
+        ]);
 
         $postArea.append($input);
-        $postArea.append($toolBar);
+        $postArea.append($toolbar);
 
         $commentsArea.html('');
         $commentsArea.append($postArea);
@@ -165,6 +157,54 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         });
     }
 
+    // Create an return a toolbar
+    function createToolbar(actions) {
+        var $toolbar = $('<div>', {
+            'class': 'comments-toolbar'
+        });
+
+        _.each(actions, function(action) {
+            var $action = $('<a>', {
+                'href': '#',
+                'text': action.text,
+                'click': function(e) {
+                    e.preventDefault();
+                    action.click();
+                }
+            });
+
+            $action.appendTo($toolbar);
+        });
+
+        return $toolbar;
+    }
+
+    // Display comment entry in post area for a thread
+    function createThreadCommentForm($postArea, thread) {
+        $postArea.html('');
+
+        var $input = $('<input>', {
+            'type': 'text',
+            'placeholder': 'Leave a comment'
+        });
+
+        var $toolbar = createToolbar([
+            {
+                text: 'Post',
+                click: function() {
+                    postComment(thread.number, $input.val(), function() {
+                        $input.val('');
+                    });
+                }
+            }
+        ]);
+
+        $postArea.append($input);
+        $postArea.append($toolbar);
+
+        $input.focus();
+    }
+
     // Display a thread and its comments
     function createThreadComments($commentsArea, $section, thread) {
         // Go fetch comments
@@ -175,31 +215,22 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-post'
         });
 
-        var $toolBar = $('<div>', {
-            'class': 'comments-toolbar'
-        });
-
-        var $postButton = $('<a>', {
-            'href': '#',
-            'text': 'Post',
-            'click': function(e) {
-                e.preventDefault();
-
-                postComment(thread.number, $input.val(), function() {
-                    $input.val('');
-                });
+        var $toolbar = createToolbar([
+            {
+                text: 'Comment',
+                click: function() {
+                    createThreadCommentForm($postArea, thread);
+                }
+            },
+            {
+                text: 'New Thread',
+                click: function() {
+                    createThreadCreation($commentsArea, $section);
+                }
             }
-        });
+        ]);
 
-        $toolBar.append($postButton);
-
-        var $input = $('<input>', {
-            'type': 'text',
-            'placeholder': 'Leave a comment'
-        });
-        $postArea.append($input);
-        $postArea.append($toolBar);
-
+        $postArea.append($toolbar);
 
         var $comments = $('<div>', {
             'class': 'comments-list',
@@ -230,27 +261,18 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             $threads.append($thread);
         });
 
-        // Link to create new thread
-        var $toolBar = $('<div>', {
-            'class': 'comments-toolbar'
-        });
-
-        var $postButton = $('<a>', {
-            'href': '#',
-            'text': 'New Thread',
-            'click': function(e) {
-                e.preventDefault();
-
-                createThreadCreation($commentsArea, $section);
+        var $toolbar = createToolbar([
+            {
+                text: 'New Thread',
+                click: function() {
+                    createThreadCreation($commentsArea, $section);
+                }
             }
-        });
-        $toolBar.append($postButton);
-
-
+        ]);
 
         $commentsArea.html('');
         $commentsArea.append($threads);
-        $commentsArea.append($toolBar);
+        $commentsArea.append($toolbar);
     }
 
     // Close all section
