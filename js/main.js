@@ -43,9 +43,15 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         }
     }
 
+    // Reurn root for api
+    function apiUrl(path) {
+        // 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+path
+        return (gitbook.state.root+'/gitbook/api/'+path).replace(/\/\/+/g, '/');
+    }
+
     // Redirect user to login page
     function redirectToLogin() {
-        location.href = 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/login';
+        location.href = apiUrl('login');
     }
 
     // Make an api request
@@ -53,7 +59,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         $.ajax({
             method: method,
             dataType: 'json',
-            url: 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+route,
+            url: apiUrl(route),
             data: data,
             success: function(result, status, xhr) {
                 isLoggedin = !!xhr.getResponseHeader('X-GitBook-Auth');
