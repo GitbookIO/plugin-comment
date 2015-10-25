@@ -112,7 +112,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Close a thread
     function closeThread(id) {
-        allThreads = _.filter(allThreads, {
+        allThreads = _.reject(allThreads, {
             'number': id
         });
         updateSections();
