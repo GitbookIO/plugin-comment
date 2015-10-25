@@ -4,6 +4,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var isLoggedin = false;
 
     var SECTIONS_SELECTOR = 'p';
+    var LIMIT_COMMENTS = 4;
 
     var TPL_COMMENT = _.template(
         '<img src="<%- user.urls.avatar %>" class="comment-avatar" />' +
@@ -45,13 +46,19 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Reurn root for api
     function apiUrl(path) {
-        // 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+path
+        //return 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+path;
         return (gitbook.state.root+'/gitbook/api/'+path).replace(/\/\/+/g, '/');
     }
 
     // Redirect user to login page
     function redirectToLogin() {
         location.href = apiUrl('login');
+    }
+
+    // Open an url in a new tab
+    function openInNewTab(url) {
+        var win = window.open(url, '_blank');
+        win.focus();
     }
 
     // Make an api request
@@ -83,8 +90,10 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Fetch threads from gitbook.com and update listing
     function fetchComments(id) {
-        apiRequest('GET', 'comments/threads/'+id+'/comments', {}, function(result) {
-            allComments[id] = result.list;
+        apiRequest('GET', 'comments/threads/'+id+'/comments', {
+            limit: LIMIT_COMMENTS
+        }, function(result) {
+            allComments[id] = result;
             updateComments(id);
         });
     }
@@ -108,7 +117,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         }, function(result) {
             // Prefill data
             allComments[id] = allComments[id] || [];
-            allComments[id].push(result);
+            allComments[id].total = allComments[id].total + 1;
+            allComments[id].list.push(result);
             updateComments(id);
 
             // Sync fetch all comments
@@ -420,16 +430,39 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Update comments for a thread
     function updateComments(number) {
-        if (!allComments[number]) return;
+        var thread = _.find(allThreads, {
+            'number': number
+        });
 
+        if (!allComments[number] || !thread) return;
+
+        // Comments are displayed
         var $list = gitbook.state.$book.find('.page-wrapper div[data-thcomments="'+number+'"]');
         if ($list.length == 0) return;
 
+        // Cleanup current list
         $list.html('');
 
-        _.each(allComments[number] || [], function(comment) {
-            $list.append(createComment(comment));
-        });
+        // Has comment left?
+        var hasLeft = Math.max(0, allComments[number].total - LIMIT_COMMENTS);
+
+        if (hasLeft > 1) {
+            $list.append(createToolbar([
+                {
+                    text: 'View '+hasLeft+' more comments',
+                    click: function() {
+                        openInNewTab(thread.urls.details);
+                    }
+                }
+            ]));
+        }
+
+        _.chain(allComments[number].list || [])
+            .reverse()
+            .each(function(comment) {
+                $list.append(createComment(comment));
+            })
+            .value();
     }
 
 
@@ -439,7 +472,6 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     gitbook.events.bind('page.change', function () {
         allThreads = [];
-        updateSections();
         fetchThreads();
     });
 });

@@ -3,7 +3,7 @@
 @comments-icon-margin: 20px;
 @comments-column-width: (2*@comments-icon-margin + @comments-icon-width + @comments-area-width);
 
-@border-color: rgba(0, 0, 0, 0.1);
+@border-color: rgba(0, 0, 0, 0.07);
 
 @avatar-size: 24px;
 
@@ -47,6 +47,8 @@
                 text-align: center;
                 border-radius: 3px;
                 color: #555;
+                user-select: none;
+                -webkit-user-select: none;
 
                 &:hover {
                     background: #ddd;
@@ -115,6 +117,16 @@
             // List of comments in a thread
             .comments-list {
                 margin-bottom: 15px;
+
+                // View more toolbar
+                .comments-toolbar {
+                    margin: @comment-padding-v 0px 2*@comment-padding-v;
+
+                    a {
+                        color: inherit;
+                        opacity: 0.4;
+                    }
+                }
             }
 
             .comment {
