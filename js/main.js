@@ -439,8 +439,9 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         });
         $icon.append($marker);
 
+        $section.find('.comments-icon').remove();
         $section.addClass('comments-section');
-        if (nComments > 0) $section.addClass('has-comments');
+        $section.toggleClass('has-comments', (nComments > 0));
         $section.append($icon);
     }
 
