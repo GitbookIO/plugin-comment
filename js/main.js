@@ -110,6 +110,20 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         }, done);
     }
 
+    // Close a thread
+    function closeThread(id) {
+        allThreads = _.filter(allThreads, {
+            number: id
+        });
+        updateSections();
+
+        apiRequest('POST', 'discussions/'+id, {
+            state: 'close'
+        }, function() {
+            fetchThreads();
+        });
+    }
+
     // Post a new comment
     function postComment(id, body, done) {
         apiRequest('POST', 'discussions/'+id+'/comments', {
@@ -273,40 +287,51 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     }
 
     // Display a thread and its comments
-    function createThreadComments($commentsArea, $section, thread) {
+    function createThreadComments($commentsArea, $section, thread, threads) {
         // Go fetch comments
         fetchComments(thread.number);
 
-        var $toolbar;
+        var actions = [];
 
         if (isLoggedin) {
-            $toolbar = createToolbar([
-                {
+            if (thread.permissions.comment) {
+                actions.push({
                     text: 'Comment',
                     click: function() {
                         createThreadCommentForm($postArea, thread);
                     }
-                },
-                {
-                    text: 'New Thread',
+                });
+            }
+
+            if (thread.permissions.close) {
+                actions.push({
+                    text: 'Close',
                     click: function() {
-                        createThreadCreation($commentsArea, $section);
+                        toggleSection($section, threads);
+                        closeThread(thread);
                     }
+                });
+            }
+
+            actions.push({
+                text: 'New Thread',
+                click: function() {
+                    createThreadCreation($commentsArea, $section);
                 }
-            ]);
+            });
         } else {
-            $toolbar = createToolbar([
+            actions = [
                 {
                     text: 'Sign in to comment',
                     click: redirectToLogin
                 }
-            ]);
+            ];
         }
 
         var $postArea = $('<div>', {
             'class': 'comments-post'
         });
-        $postArea.append($toolbar);
+        $postArea.append(createToolbar(actions));
 
 
         var $comments = $('<div>', {
@@ -385,7 +410,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         if (threads.length > 1) {
             createThreadsList($commentsArea, $section, threads);
         } else if (threads.length == 1) {
-            createThreadComments($commentsArea, $section, threads[0]);
+            createThreadComments($commentsArea, $section, threads[0], threads);
         } else {
             createThreadCreation($commentsArea, $section);
         }
