@@ -81,7 +81,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Fetch threads from gitbook.com and update listing
     function fetchThreads() {
         apiRequest('GET', 'discussions', {
-            'filename': gitbook.state.filepath
+            'filename': gitbook.state.filepath,
+            'state': 'open'
         }, function(result) {
             allThreads = result.list;
             updateSections();
@@ -91,7 +92,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Fetch threads from gitbook.com and update listing
     function fetchComments(id) {
         apiRequest('GET', 'discussions/'+id+'/comments', {
-            limit: LIMIT_COMMENTS
+            'limit': LIMIT_COMMENTS
         }, function(result) {
             allComments[id] = result;
             updateComments(id);
@@ -101,11 +102,11 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Create a new thread on th backend
     function postThread(subject, body, section, done) {
         apiRequest('POST', 'discussions', {
-            title: subject,
-            body: body,
-            context: {
-                filename: gitbook.state.filepath,
-                section: section
+            'title': subject,
+            'body': body,
+            'context': {
+                'filename': gitbook.state.filepath,
+                'section': section
             }
         }, done);
     }
