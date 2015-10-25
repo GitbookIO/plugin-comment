@@ -80,7 +80,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Fetch threads from gitbook.com and update listing
     function fetchThreads() {
-        apiRequest('GET', 'comments/threads', {
+        apiRequest('GET', 'discussions', {
             'filename': gitbook.state.filepath
         }, function(result) {
             allThreads = result.list;
@@ -90,7 +90,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Fetch threads from gitbook.com and update listing
     function fetchComments(id) {
-        apiRequest('GET', 'comments/threads/'+id+'/comments', {
+        apiRequest('GET', 'discussions/'+id+'/comments', {
             limit: LIMIT_COMMENTS
         }, function(result) {
             allComments[id] = result;
@@ -100,7 +100,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Create a new thread on th backend
     function postThread(subject, body, section, done) {
-        apiRequest('POST', 'comments/threads', {
+        apiRequest('POST', 'discussions', {
             title: subject,
             body: body,
             context: {
@@ -112,7 +112,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Post a new comment
     function postComment(id, body, done) {
-        apiRequest('POST', 'comments/threads/'+id+'/comments', {
+        apiRequest('POST', 'discussions/'+id+'/comments', {
             body: body
         }, function(result) {
             // Prefill data
@@ -446,7 +446,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         // Has comment left?
         var hasLeft = Math.max(0, allComments[number].total - LIMIT_COMMENTS);
 
-        if (hasLeft > 1) {
+        if (hasLeft > 0) {
             $list.append(createToolbar([
                 {
                     text: 'View '+hasLeft+' more comments',
