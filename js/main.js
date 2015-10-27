@@ -179,22 +179,27 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Create form to create thread
     function createThreadCreation($commentsArea, $section) {
         // Post area
-        var $input;
+        var $title, $description;
         var $postArea = $('<div>', {
             'class': 'comments-post'
         });
 
         if (isLoggedin) {
-            $input = $('<input>', {
+            $title = $('<input>', {
                 'type': 'text',
                 'placeholder': 'Start a new discussion'
+            });
+
+            $description = $('<input>', {
+                'type': 'text',
+                'placeholder': 'Optional comment'
             });
 
             var $toolbar = createToolbar([
                 {
                     text: 'Post',
                     click: function() {
-                        postThread($input.val(), '', $section.text(), function(thread) {
+                        postThread($title.val(), $description.val(), $section.text(), function(thread) {
                             // Add to the list of all threads
                             allThreads.push(thread);
                             updateSections();
@@ -206,7 +211,17 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 }
             ]);
 
-            $postArea.append($input);
+            $description.hide();
+            $title.keyup(function(e) {
+                if ($title.val().length > 3) {
+                    $description.show();
+                } else if (!$description.val()) {
+                    $description.hide();
+                }
+            })
+
+            $postArea.append($title);
+            $postArea.append($description);
             $postArea.append($toolbar);
         } else {
             var $toolbar = createToolbar([
@@ -221,7 +236,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         $commentsArea.html('');
         $commentsArea.append($postArea);
 
-        if ($input) $input.focus();
+        if ($title) $title.focus();
     }
 
     // Create and return a thread for listing
