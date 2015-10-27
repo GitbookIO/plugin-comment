@@ -16,7 +16,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     var TPL_THREAD = _.template(
         '<div class="thread-body">' +
-            '<div class="thread-title"><%= title %></div>' +
+            '<div class="thread-title"><%- title %></div>' +
             '<div class="thread-user">#<%- number %> posted by <%- user.name %></div>' +
         '</div>');
 
