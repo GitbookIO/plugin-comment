@@ -176,8 +176,19 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             .value();
     }
 
+    // Return text for a section
+    function sectionText($section) {
+        return $section
+            .clone()
+            .find('.comments-area,.comments-icon')
+            .remove()
+            .end()
+            .text();
+    }
+
     // Create form to create thread
     function createThreadCreation($commentsArea, $section) {
+        console.log(sectionText($section));
         // Post area
         var $title, $description;
         var $postArea = $('<div>', {
@@ -199,7 +210,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 {
                     text: 'Post',
                     click: function() {
-                        postThread($title.val(), $description.val(), $section.text(), function(thread) {
+                        postThread($title.val(), $description.val(), sectionText($section), function(thread) {
                             // Add to the list of all threads
                             allThreads.push(thread);
                             updateSections();
@@ -436,7 +447,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Initialize comments system on a paragraph (aka section)
     function bindSection($section) {
         // Find matching threads with this section
-        var threads = filterThreads($section.text());
+        var threads = filterThreads(sectionText($section));
         var nComments = _.reduce(threads, function(sum, thread) {
             return sum + 1 + thread.comments;
         }, 0);
