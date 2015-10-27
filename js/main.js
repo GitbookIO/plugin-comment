@@ -106,6 +106,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'body': body,
             'context': {
                 'filename': gitbook.state.filepath,
+                'chapterTitle': gitbook.state.chapterTitle,
                 'section': section
             }
         }, done);
