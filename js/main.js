@@ -11,7 +11,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         '<img src="<%- user.urls.avatar %>" class="comment-avatar" />' +
         '<div class="comment-body">' +
             '<a href="<%- user.urls.profile %>" target="_blank" class="comment-user"><%- user.name %></a>' +
-            '<div class="comment-content"><% if (title) { %><%- title %><% if (body) { %><br/><br/><% } %><% } %><%= body || "" %></div>' +
+            '<div class="comment-content"><% if (title) { %><%- title %><% if (body) { %><br/><% } %><% } %><%= body || "" %></div>' +
         '</div>');
 
     var TPL_THREAD = _.template(
