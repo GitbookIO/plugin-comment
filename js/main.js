@@ -8,16 +8,16 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var LIMIT_COMMENTS = 4;
 
     var TPL_COMMENT = _.template(
-        '<img src="<%- user.urls.avatar %>" class="comment-avatar" />' +
+        '<img src="<%- comment.user.urls.avatar %>" class="comment-avatar" />' +
         '<div class="comment-body">' +
-            '<a href="<%- user.urls.profile %>" target="_blank" class="comment-user"><%- user.name %></a>' +
-            '<div class="comment-content"><% if (title) { %><%- title %><% if (body) { %><br/><% } %><% } %><%= body || "" %></div>' +
+            '<a href="<%- comment.user.urls.profile %>" target="_blank" class="comment-user"><%- comment.user.name %></a>' +
+            '<div class="comment-content"><% if (comment.title) { %><%- comment.title %><% if (comment.body) { %><br/><% } %><% } %><%= comment.body || "" %></div>' +
         '</div>');
 
     var TPL_THREAD = _.template(
         '<div class="thread-body">' +
-            '<div class="thread-title"><%- title %></div>' +
-            '<div class="thread-user">#<%- number %> posted by <%- user.name %></div>' +
+            '<div class="thread-title"><%- thread.title %></div>' +
+            '<div class="thread-user">#<%- thread.number %> posted by <%- thread.user.name %></div>' +
         '</div>');
 
     // Move content to the left
@@ -259,7 +259,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createThread(thread) {
         return $('<div>', {
             'class': 'thread',
-            'html': TPL_THREAD(thread)
+            'html': TPL_THREAD(({ thread: thread }))
         });
     }
 
@@ -267,7 +267,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createComment(comment, isThread) {
         return $('<div>', {
             'class': 'comment',
-            'html': TPL_COMMENT(comment)
+            'html': TPL_COMMENT({ comment: comment })
         });
     }
 
