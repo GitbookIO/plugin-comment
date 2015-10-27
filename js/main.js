@@ -244,7 +244,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             $postArea.append($toolbar);
         }
 
-        $commentsArea.html('');
+        $commentsArea.empty();
         $commentsArea.append($postArea);
 
         if ($title) $title.focus();
@@ -290,7 +290,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Display comment entry in post area for a thread
     function createThreadCommentForm($postArea, thread) {
-        $postArea.html('');
+        $postArea.empty();
 
         var $input = $('<input>', {
             'type': 'text',
@@ -367,7 +367,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'data-thcomments': thread.number
         });
 
-        $commentsArea.html('');
+        $commentsArea.empty();
         $commentsArea.append(createComment(thread));
         $commentsArea.append($comments);
         $commentsArea.append($postArea);
@@ -409,7 +409,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             ]);
         }
 
-        $commentsArea.html('');
+        $commentsArea.empty();
         $commentsArea.append($threads);
         $commentsArea.append($toolbar);
     }
@@ -495,7 +495,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         if ($list.length == 0) return;
 
         // Cleanup current list
-        $list.html('');
+        $list.empty();
 
         // Has comment left?
         var hasLeft = Math.max(0, allComments[number].total - LIMIT_COMMENTS);
