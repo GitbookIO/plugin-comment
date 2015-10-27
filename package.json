@@ -5,9 +5,8 @@
     "version": "0.0.6",
     "license": "Apache-2.0",
     "homepage": "https://github.com/GitbookIO/plugin-comment",
-    "keywords": ["math", "latex"],
     "engines": {
-        "gitbook": ">=2.4.3"
+        "gitbook": ">=2.5.0"
     },
     "devDependencies": {
         "less": "2.5.1",
