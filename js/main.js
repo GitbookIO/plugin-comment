@@ -48,7 +48,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     // Reurn root for api
     function apiUrl(path) {
         //return 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+path;
-        return (gitbook.state.root+'/gitbook/api/'+path).replace(/\/\/+/g, '/');
+        return (gitbook.state.root+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, "$1");
     }
 
     // Redirect user to login page
