@@ -2,6 +2,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var allThreads = [];
     var allComments = {};
     var isLoggedin = false;
+    var isLoaded = false;
 
     var SECTIONS_SELECTOR = 'p';
     var LIMIT_COMMENTS = 4;
@@ -69,11 +70,15 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             url: apiUrl(route),
             data: data,
             success: function(result, status, xhr) {
+                isLoaded = true;
                 isLoggedin = !!xhr.getResponseHeader('X-GitBook-Auth');
                 success(result);
             },
             error: function(xhr, textStatus) {
-                alert('Error with comments: '+textStatus);
+                if (isLoaded) {
+                    alert('Error processing comments: '+textStatus);
+                    console.log(xhr, textStatus);
+                }
             }
         });
     }
