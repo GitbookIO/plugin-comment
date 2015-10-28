@@ -451,8 +451,11 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Initialize comments system on a paragraph (aka section)
     function bindSection($section) {
+        var text = sectionText($section);
+        if (text.length < 5) return;
+
         // Find matching threads with this section
-        var threads = filterThreads(sectionText($section));
+        var threads = filterThreads(text);
         var nComments = _.reduce(threads, function(sum, thread) {
             return sum + 1 + thread.comments;
         }, 0);
