@@ -29,7 +29,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
         $wrapper.toggleClass('comments-open', state);
         if (!$wrapper.hasClass('comments-open')) {
-            $inner.css('left', 'auto');
+            $inner.css('left', '0px');
         } else {
             var commentsWidth = 330;
             var innerWidth = $inner.width();
