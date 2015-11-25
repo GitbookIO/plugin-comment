@@ -47,8 +47,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Reurn root for api
     function apiUrl(path) {
-        //return 'http://localhost:5000/content/book/samypesse/test-beta/gitbook/api/'+path;
-        return (gitbook.state.root+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, "$1");
+        return (gitbook.state.bookRoot+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, "$1");
     }
 
     // Redirect user to login page
@@ -83,10 +82,16 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         });
     }
 
+    // Get absolute filepath
+    function getFilepath() {
+        if (gitbook.state.innerLanguage) return [gitbook.state.innerLanguage, gitbook.state.filepath].join('/');
+        return gitbook.state.filepath;
+    }
+
     // Fetch threads from gitbook.com and update listing
     function fetchThreads() {
         apiRequest('GET', 'discussions', {
-            'filename': gitbook.state.filepath,
+            'filename': getFilepath(),
             'state': 'open'
         }, function(result) {
             allThreads = result.list;
@@ -110,7 +115,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'title': subject,
             'body': body,
             'context': {
-                'filename': gitbook.state.filepath,
+                'filename': getFilepath(),
                 'chapterTitle': gitbook.state.chapterTitle,
                 'section': section
             }
