@@ -1,4 +1,5 @@
 require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
+    var config = {};
     var allThreads = [];
     var allComments = {};
     var isLoggedin = false;
@@ -482,6 +483,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         $section.find('.comments-icon').remove();
         $section.addClass('comments-section');
         $section.toggleClass('has-comments', (nComments > 0));
+        if (config.highlightCommented) $section.toggleClass('has-highlight-comments', (nComments > 0));
         $section.append($icon);
     }
 
@@ -533,8 +535,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     }
 
 
-    gitbook.events.bind('start', function (e, config) {
-
+    gitbook.events.bind('start', function (e, cfg) {
+        config = cfg.comment || {};
     });
 
     gitbook.events.bind('page.change', function () {
