@@ -2,7 +2,7 @@
     "name": "gitbook-plugin-comment",
     "description": "Inline comments with gitbook.com",
     "main": "index.js",
-    "version": "0.1.9",
+    "version": "0.2.0",
     "license": "Apache-2.0",
     "homepage": "https://github.com/GitbookIO/plugin-comment",
     "engines": {
