@@ -1,34 +1,35 @@
 {
-    "name": "gitbook-plugin-comment",
-    "description": "Inline comments with gitbook.com",
-    "main": "index.js",
-    "version": "0.2.1",
-    "license": "Apache-2.0",
-    "homepage": "https://github.com/GitbookIO/plugin-comment",
-    "engines": {
-        "gitbook": ">=2.6.1"
-    },
-    "devDependencies": {
-        "less": "2.5.1",
-        "minifier": "0.7.1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/GitbookIO/plugin-comment.git"
-    },
-    "bugs": {
-        "url": "https://github.com/GitbookIO/plugin-comment/issues"
-    },
-    "gitbook": {
-        "properties": {
-            "highlightCommented": {
-                "type": "boolean",
-                "title": "Highlight sections that are commented",
-                "default": true
-            }
-        }
-    },
-    "scripts": {
-        "prepublish": "mkdir -p assets; lessc ./less/main.less > ./assets/plugin.css; minify ./js/main.js > ./assets/plugin.js"
+  "name": "gitbook-plugin-comment",
+  "description": "Inline comments with gitbook.com",
+  "main": "index.js",
+  "version": "0.2.1",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/GitbookIO/plugin-comment",
+  "engines": {
+    "gitbook": ">=2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "2.7.0",
+    "less": "2.5.1",
+    "minifier": "0.7.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/plugin-comment.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GitbookIO/plugin-comment/issues"
+  },
+  "gitbook": {
+    "properties": {
+      "highlightCommented": {
+        "type": "boolean",
+        "title": "Highlight sections that are commented",
+        "default": true
+      }
     }
+  },
+  "scripts": {
+    "prepublish": "mkdir -p assets; lessc ./less/main.less > ./assets/plugin.css; minify ./js/main.js > ./assets/plugin.js"
+  }
 }
