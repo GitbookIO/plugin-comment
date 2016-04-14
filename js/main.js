@@ -48,7 +48,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Reurn root for api
     function apiUrl(path) {
-        return (gitbook.state.bookRoot+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, "$1");
+        return (gitbook.state.bookRoot+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, '$1');
     }
 
     // Redirect user to login page
@@ -393,7 +393,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         });
 
         _.each(threads, function(thread) {
-            var $thread = createThread(thread)
+            var $thread = createThread(thread);
             $thread.click(function(e) {
                 createThreadComments($commentsArea, $section, thread);
             });
