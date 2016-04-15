@@ -529,12 +529,10 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             ]));
         }
 
-        _.chain(allComments[number].list || [])
-            .reverse()
-            .each(function(comment) {
-                $list.append(createComment(comment));
-            })
-            .value();
+        var comments = (allComments[number].list || []).reverse();
+        $.each(comments, function(i, comment) {
+            $list.append(createComment(comment));
+        });
     }
 
 
