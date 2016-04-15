@@ -125,8 +125,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Close a thread
     function closeThread(id) {
-        allThreads = _.reject(allThreads, {
-            'number': id
+        allThreads = $.grep(allThreads, function(thread) {
+            return thread.number != id;
         });
         updateSections();
 
@@ -283,7 +283,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-toolbar'
         });
 
-        _.each(actions, function(action) {
+        $.each(actions, function(i, action) {
             var $action = $('<a>', {
                 'href': '#',
                 'text': action.text,
@@ -392,7 +392,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-threads'
         });
 
-        _.each(threads, function(thread) {
+        $.each(threads, function(i, thread) {
             var $thread = createThread(thread);
             $thread.click(function(e) {
                 createThreadComments($commentsArea, $section, thread);
@@ -462,9 +462,10 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
         // Find matching threads with this section
         var threads = filterThreads(text);
-        var nComments = _.reduce(threads, function(sum, thread) {
-            return sum + 1 + thread.comments;
-        }, 0);
+        var nComments = 0;
+        $.each(threads, function(i, thread) {
+            nComments += thread.comments + 1;
+        });
 
         // Create marker
         var $marker = $('<div>', {
@@ -499,9 +500,11 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Update comments for a thread
     function updateComments(number) {
-        var thread = _.find(allThreads, {
-            'number': number
+        // Find corresponding thread
+        var filtered = $.grep(allThreads, function(thread) {
+            return thread.number == number;
         });
+        var thread = filtered[0];
 
         if (!allComments[number] || !thread) return;
 
