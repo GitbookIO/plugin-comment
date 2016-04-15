@@ -8,18 +8,84 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var SECTIONS_SELECTOR = 'p';
     var LIMIT_COMMENTS = 4;
 
-    var TPL_COMMENT = _.template(
-        '<img src="<%- comment.user.urls.avatar %>" class="comment-avatar" />' +
-        '<div class="comment-body">' +
-            '<a href="<%- comment.user.urls.profile %>" target="_blank" class="comment-user"><%- comment.user.name %></a>' +
-            '<div class="comment-content"><% if (comment.title) { %><%- comment.title %><% if (comment.body) { %><br/><% } %><% } %><%= comment.body || "" %></div>' +
-        '</div>');
+    // Generate template for a comment
+    /*
+    '<img src="<%- comment.user.urls.avatar %>" class="comment-avatar" />' +
+    '<div class="comment-body">' +
+        '<a href="<%- comment.user.urls.profile %>" target="_blank" class="comment-user"><%- comment.user.name %></a>' +
+        '<div class="comment-content"><% if (comment.title) { %><%- comment.title %><% if (comment.body) { %><br/><% } %><% } %><%= comment.body || "" %></div>' +
+    '</div>'
+    */
+    function generateComment(comment) {
+        var $userAvatar = $('<img>', {
+            class: 'comment-avatar',
+            src:   comment.user.urls.avatar
+        });
 
-    var TPL_THREAD = _.template(
-        '<div class="thread-body">' +
-            '<div class="thread-title"><%- thread.title %></div>' +
-            '<div class="thread-user">#<%- thread.number %> posted by <%- thread.user.name %></div>' +
-        '</div>');
+        var $commentBody = $('<div>', { class: 'comment-body '});
+        var $commentUser = $('<a>', {
+            class:  'comment-user',
+            target: '_blank',
+            href:   comment.user.urls.profile,
+            text:   comment.user.name
+        });
+
+        var commentContent = '';
+        if (comment.title) {
+            commentContent += comment.title;
+            if (comment.body) {
+                commentContent += '<br>';
+            }
+        }
+        if (comment.body) {
+            commentContent += comment.body;
+        }
+
+        var $commentContent = $('<div>', {
+            class: 'comment-content',
+            html:  commentContent
+        });
+
+        $commentBody.append($commentUser);
+        $commentBody.append($commentContent);
+
+        var $root = $('<div>');
+        $root.append($userAvatar);
+        $root.append($commentBody);
+
+        return $root.html();
+    }
+
+    // Generate template for a thread
+    /*
+    '<div class="thread-body">' +
+        '<div class="thread-title"><%- thread.title %></div>' +
+        '<div class="thread-user">#<%- thread.number %> posted by <%- thread.user.name %></div>' +
+    '</div>'
+    */
+    function generateThread(thread) {
+        var $threadBody = $('<div>', {
+            class: 'thread-body'
+        });
+
+        var $threadTitle = $('<div>', {
+            class: 'thread-title',
+            text: thread.title
+        });
+
+        var $threadUser = $('<div>', {
+            class: 'thread-user',
+            text: '#'+thread.number+' posted by '+thread.user.name
+        });
+
+        $threadBody.append($threadTitle);
+        $threadBody.append($threadUser);
+
+        var $root = $('<div>');
+        $root.append($threadBody);
+
+        return $root.html();
+    }
 
     // Move content to the left
     // Calcul the right position
@@ -274,7 +340,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createThread(thread) {
         return $('<div>', {
             'class': 'thread',
-            'html': TPL_THREAD(({ thread: thread }))
+            'html': generateThread(thread)
         });
     }
 
@@ -282,7 +348,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createComment(comment, isThread) {
         return $('<div>', {
             'class': 'comment',
-            'html': TPL_COMMENT({ comment: comment })
+            'html': generateComment(comment)
         });
     }
 
