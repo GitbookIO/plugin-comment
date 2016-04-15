@@ -30,6 +30,6 @@
     }
   },
   "scripts": {
-    "prepublish": "mkdir -p assets; lessc ./less/main.less > ./assets/plugin.css; minify ./js/main.js > ./assets/plugin.js"
+    "prepublish": "mkdir -p assets; lessc ./less/main.less > ./assets/plugin.css; minify --output ./assets/plugin.js ./js/main.js"
   }
 }
