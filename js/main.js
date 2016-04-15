@@ -1,4 +1,4 @@
-require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
+require(['gitbook', 'jQuery'], function (gitbook, $) {
     var config = {};
     var allThreads = [];
     var allComments = {};
