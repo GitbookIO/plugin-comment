@@ -110,7 +110,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         });
     }
 
-    // Create a new thread on th backend
+    // Create a new thread on backend
     function postThread(subject, body, section, done) {
         apiRequest('POST', 'discussions', {
             'title': subject,
@@ -201,7 +201,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createThreadCreation($commentsArea, $section) {
         console.log(sectionText($section));
         // Post area
-        var $title, $description;
+        var $title, $description, $toolbar;
         var $postArea = $('<div>', {
             'class': 'comments-post'
         });
@@ -217,7 +217,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 'placeholder': 'Optional comment'
             });
 
-            var $toolbar = createToolbar([
+            $toolbar = createToolbar([
                 {
                     text: 'Post',
                     click: function() {
@@ -240,13 +240,13 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 } else if (!$description.val()) {
                     $description.hide();
                 }
-            })
+            });
 
             $postArea.append($title);
             $postArea.append($description);
             $postArea.append($toolbar);
         } else {
-            var $toolbar = createToolbar([
+            $toolbar = createToolbar([
                 {
                     text: 'Sign in to comment',
                     click: redirectToLogin
