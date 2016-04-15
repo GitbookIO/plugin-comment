@@ -158,33 +158,42 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function filterThreads(section) {
         var words = section.split(' ');
 
-        return _.chain(allThreads)
-            .map(function(thread) {
-                var threadWords = (thread.context.section || '').split(' ');
+        // Compute matching for threads
+        var results = $.map(allThreads, function(thread) {
+            var threadWords = (thread.context.section || '').split(' ');
 
-                var commonWordsWithSection = _.filter(threadWords, function(word) {
-                    return _.contains(words, word);
-                });
-                var commonWordsFromSection = _.filter(words, function(word) {
-                    return _.contains(threadWords, word);
-                });
+            var commonWordsWithSection = $.grep(threadWords, function(word) {
+                return $.inArray(word, words) !== -1;
+            });
+            var commonWordsFromSection = $.grep(words, function(word) {
+                return $.inArray(word, threadWords) !== -1;
+            });
 
-                var matching = (
-                    (commonWordsWithSection.length/threadWords.length)
-                    + (commonWordsFromSection.length/words.length)
-                ) / 2;
+            var matching = (
+                (commonWordsWithSection.length/threadWords.length)
+                + (commonWordsFromSection.length/words.length)
+            ) / 2;
 
-                return {
-                    matching: matching,
-                    thread: thread
-                };
-            })
-            .filter(function(r) {
-                return r.matching > 0.8;
-            })
-            .sortBy('matching')
-            .pluck('thread')
-            .value();
+            return {
+                matching: matching,
+                thread: thread
+            };
+        });
+
+        // Keep highly matched threads
+        results = $.grep(results, function(r) {
+            return r.matching > 0.8;
+        });
+
+        // Sort thread by matching
+        results = results.sort(function(a, b) {
+            return a.matching - b.matching;
+        });
+
+        // Return threads
+        return $.map(results, function(r) {
+            return r.thread;
+        });
     }
 
     // Return text for a section
