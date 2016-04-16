@@ -114,7 +114,7 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
 
     // Reurn root for api
     function apiUrl(path) {
-        return (gitbook.state.bookRoot+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, '$1');
+        return (gitbook.state.bookRoot+'gitbook/api/'+path).replace(/([^:]\/)\/+/g, '$1');
     }
 
     // Redirect user to login page
