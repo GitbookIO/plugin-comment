@@ -253,7 +253,7 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
 
         // Sort thread by matching
         results = results.sort(function(a, b) {
-            return a.matching - b.matching;
+            return b.matching - a.matching;
         });
 
         // Return threads
