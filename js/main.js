@@ -1,4 +1,4 @@
-require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
+require(['gitbook', 'jQuery'], function (gitbook, $) {
     var config = {};
     var allThreads = [];
     var allComments = {};
@@ -8,18 +8,84 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     var SECTIONS_SELECTOR = 'p';
     var LIMIT_COMMENTS = 4;
 
-    var TPL_COMMENT = _.template(
-        '<img src="<%- comment.user.urls.avatar %>" class="comment-avatar" />' +
-        '<div class="comment-body">' +
-            '<a href="<%- comment.user.urls.profile %>" target="_blank" class="comment-user"><%- comment.user.name %></a>' +
-            '<div class="comment-content"><% if (comment.title) { %><%- comment.title %><% if (comment.body) { %><br/><% } %><% } %><%= comment.body || "" %></div>' +
-        '</div>');
+    // Generate template for a comment
+    /*
+    '<img src="<%- comment.user.urls.avatar %>" class="comment-avatar" />' +
+    '<div class="comment-body">' +
+        '<a href="<%- comment.user.urls.profile %>" target="_blank" class="comment-user"><%- comment.user.name %></a>' +
+        '<div class="comment-content"><% if (comment.title) { %><%- comment.title %><% if (comment.body) { %><br/><% } %><% } %><%= comment.body || "" %></div>' +
+    '</div>'
+    */
+    function generateComment(comment) {
+        var $userAvatar = $('<img>', {
+            class: 'comment-avatar',
+            src:   comment.user.urls.avatar
+        });
 
-    var TPL_THREAD = _.template(
-        '<div class="thread-body">' +
-            '<div class="thread-title"><%- thread.title %></div>' +
-            '<div class="thread-user">#<%- thread.number %> posted by <%- thread.user.name %></div>' +
-        '</div>');
+        var $commentBody = $('<div>', { class: 'comment-body '});
+        var $commentUser = $('<a>', {
+            class:  'comment-user',
+            target: '_blank',
+            href:   comment.user.urls.profile,
+            text:   comment.user.name
+        });
+
+        var commentContent = '';
+        if (comment.title) {
+            commentContent += comment.title;
+            if (comment.body) {
+                commentContent += '<br>';
+            }
+        }
+        if (comment.body) {
+            commentContent += comment.body;
+        }
+
+        var $commentContent = $('<div>', {
+            class: 'comment-content',
+            html:  commentContent
+        });
+
+        $commentBody.append($commentUser);
+        $commentBody.append($commentContent);
+
+        var $root = $('<div>');
+        $root.append($userAvatar);
+        $root.append($commentBody);
+
+        return $root.html();
+    }
+
+    // Generate template for a thread
+    /*
+    '<div class="thread-body">' +
+        '<div class="thread-title"><%- thread.title %></div>' +
+        '<div class="thread-user">#<%- thread.number %> posted by <%- thread.user.name %></div>' +
+    '</div>'
+    */
+    function generateThread(thread) {
+        var $threadBody = $('<div>', {
+            class: 'thread-body'
+        });
+
+        var $threadTitle = $('<div>', {
+            class: 'thread-title',
+            text: thread.title
+        });
+
+        var $threadUser = $('<div>', {
+            class: 'thread-user',
+            text: '#'+thread.number+' posted by '+thread.user.name
+        });
+
+        $threadBody.append($threadTitle);
+        $threadBody.append($threadUser);
+
+        var $root = $('<div>');
+        $root.append($threadBody);
+
+        return $root.html();
+    }
 
     // Move content to the left
     // Calcul the right position
@@ -48,7 +114,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Reurn root for api
     function apiUrl(path) {
-        return (gitbook.state.bookRoot+'/gitbook/api/'+path).replace(/([^:]\/)\/+/g, "$1");
+        return (gitbook.state.bookRoot+'gitbook/api/'+path).replace(/([^:]\/)\/+/g, '$1');
     }
 
     // Redirect user to login page
@@ -110,7 +176,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
         });
     }
 
-    // Create a new thread on th backend
+    // Create a new thread on backend
     function postThread(subject, body, section, done) {
         apiRequest('POST', 'discussions', {
             'title': subject,
@@ -125,8 +191,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Close a thread
     function closeThread(id) {
-        allThreads = _.reject(allThreads, {
-            'number': id
+        allThreads = $.grep(allThreads, function(thread) {
+            return thread.number != id;
         });
         updateSections();
 
@@ -158,33 +224,37 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function filterThreads(section) {
         var words = section.split(' ');
 
-        return _.chain(allThreads)
-            .map(function(thread) {
-                var threadWords = (thread.context.section || '').split(' ');
+        // Compute matching for threads
+        var results = $.map(allThreads, function(thread) {
+            var threadWords = (thread.context.section || '').split(' ');
 
-                var commonWordsWithSection = _.filter(threadWords, function(word) {
-                    return _.contains(words, word);
-                });
-                var commonWordsFromSection = _.filter(words, function(word) {
-                    return _.contains(threadWords, word);
-                });
+            var commonWordsWithSection = $.grep(threadWords, function(word) {
+                return $.inArray(word, words) !== -1;
+            });
+            var commonWordsFromSection = $.grep(words, function(word) {
+                return $.inArray(word, threadWords) !== -1;
+            });
 
-                var matching = (
-                    (commonWordsWithSection.length/threadWords.length)
-                    + (commonWordsFromSection.length/words.length)
-                ) / 2;
+            var matching = (
+                (commonWordsWithSection.length/threadWords.length)
+                + (commonWordsFromSection.length/words.length)
+            ) / 2;
 
-                return {
-                    matching: matching,
-                    thread: thread
-                };
-            })
-            .filter(function(r) {
-                return r.matching > 0.8;
-            })
-            .sortBy('matching')
-            .pluck('thread')
-            .value();
+            return {
+                matching: matching,
+                thread: thread
+            };
+        });
+
+        // Keep highly matched threads
+        results = $.grep(results, function(r) {
+            return r.matching > 0.8;
+        });
+
+        // Return threads
+        return $.map(results, function(r) {
+            return r.thread;
+        });
     }
 
     // Return text for a section
@@ -201,7 +271,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createThreadCreation($commentsArea, $section) {
         console.log(sectionText($section));
         // Post area
-        var $title, $description;
+        var $title, $description, $toolbar;
         var $postArea = $('<div>', {
             'class': 'comments-post'
         });
@@ -217,7 +287,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 'placeholder': 'Optional comment'
             });
 
-            var $toolbar = createToolbar([
+            $toolbar = createToolbar([
                 {
                     text: 'Post',
                     click: function() {
@@ -240,13 +310,13 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
                 } else if (!$description.val()) {
                     $description.hide();
                 }
-            })
+            });
 
             $postArea.append($title);
             $postArea.append($description);
             $postArea.append($toolbar);
         } else {
-            var $toolbar = createToolbar([
+            $toolbar = createToolbar([
                 {
                     text: 'Sign in to comment',
                     click: redirectToLogin
@@ -265,7 +335,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createThread(thread) {
         return $('<div>', {
             'class': 'thread',
-            'html': TPL_THREAD(({ thread: thread }))
+            'html': generateThread(thread)
         });
     }
 
@@ -273,7 +343,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
     function createComment(comment, isThread) {
         return $('<div>', {
             'class': 'comment',
-            'html': TPL_COMMENT({ comment: comment })
+            'html': generateComment(comment)
         });
     }
 
@@ -283,7 +353,7 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-toolbar'
         });
 
-        _.each(actions, function(action) {
+        $.each(actions, function(i, action) {
             var $action = $('<a>', {
                 'href': '#',
                 'text': action.text,
@@ -392,8 +462,8 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             'class': 'comments-threads'
         });
 
-        _.each(threads, function(thread) {
-            var $thread = createThread(thread)
+        $.each(threads, function(i, thread) {
+            var $thread = createThread(thread);
             $thread.click(function(e) {
                 createThreadComments($commentsArea, $section, thread);
             });
@@ -462,9 +532,10 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
         // Find matching threads with this section
         var threads = filterThreads(text);
-        var nComments = _.reduce(threads, function(sum, thread) {
-            return sum + 1 + thread.comments;
-        }, 0);
+        var nComments = 0;
+        $.each(threads, function(i, thread) {
+            nComments += thread.comments + 1;
+        });
 
         // Create marker
         var $marker = $('<div>', {
@@ -499,9 +570,11 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
 
     // Update comments for a thread
     function updateComments(number) {
-        var thread = _.find(allThreads, {
-            'number': number
+        // Find corresponding thread
+        var filtered = $.grep(allThreads, function(thread) {
+            return thread.number == number;
         });
+        var thread = filtered[0];
 
         if (!allComments[number] || !thread) return;
 
@@ -526,12 +599,10 @@ require(['gitbook', 'jQuery', 'lodash'], function (gitbook, $, _) {
             ]));
         }
 
-        _.chain(allComments[number].list || [])
-            .reverse()
-            .each(function(comment) {
-                $list.append(createComment(comment));
-            })
-            .value();
+        var comments = (allComments[number].list || []).reverse();
+        $.each(comments, function(i, comment) {
+            $list.append(createComment(comment));
+        });
     }
 
 
