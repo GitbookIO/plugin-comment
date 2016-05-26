@@ -89,12 +89,15 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
 
     // Move content to the left
     // Calcul the right position
-    function toggleComments(state) {
+    function toggleComments(state, $from) {
         var $wrapper = gitbook.state.$book.find('.page-wrapper');
         var $inner = $wrapper.find('.page-inner');
         var $nextNavigation = gitbook.state.$book.find('.navigation.navigation-next');
 
         $wrapper.toggleClass('comments-open', state);
+        // Fire toggle event
+        gitbook.events.trigger('comment.toggled', [$from, state]);
+
         if (!$wrapper.hasClass('comments-open')) {
             $inner.css('left', '0px');
         } else {
@@ -358,7 +361,7 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
                 'text': action.text,
                 'click': function(e) {
                     e.preventDefault();
-                    action.click();
+                    action.click($(this));
                 }
             });
 
@@ -414,8 +417,8 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
             if (thread.permissions.close) {
                 actions.push({
                     text: 'Close',
-                    click: function() {
-                        toggleSection($section, threads);
+                    click: function($from) {
+                        toggleSection($section, threads, $from);
                         closeThread(thread.number);
                     }
                 });
@@ -500,11 +503,11 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
     }
 
     // Toggle comments display
-    function toggleSection($section, threads) {
+    function toggleSection($section, threads, $from) {
         var isOpen = !$section.hasClass('has-comments-open');
         closeAllSections();
         $section.toggleClass('has-comments-open', isOpen);
-        toggleComments(isOpen);
+        toggleComments(isOpen, $from);
 
         if (!isOpen) return;
 
@@ -542,7 +545,7 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
             'text': nComments? nComments : '+'
         });
         $marker.on('click', function() {
-            toggleSection($section, threads);
+            toggleSection($section, threads, $(this));
         });
 
         var $icon = $('<div>', {
