@@ -269,7 +269,6 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
 
     // Create form to create thread
     function createThreadCreation($commentsArea, $section) {
-        console.log(sectionText($section));
         // Post area
         var $title, $description, $toolbar;
         var $postArea = $('<div>', {
