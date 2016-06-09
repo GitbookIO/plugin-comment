@@ -145,7 +145,8 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
             },
             error: function(xhr, textStatus) {
                 if (isLoaded) {
-                    alert('Error processing comments: '+textStatus);
+                    var errorMessage = (xhr.responseJSON? xhr.responseJSON.error : '') || xhr.responseText || textStatus;
+                    alert('Error with inline comments: '+errorMessage);
                     console.log(xhr, textStatus);
                 }
             }
