@@ -5,7 +5,7 @@ require(['gitbook', 'jQuery'], function (gitbook, $) {
     var isLoggedin = false;
     var isLoaded = false;
 
-    var SECTIONS_SELECTOR = 'p';
+    var SECTIONS_SELECTOR = 'p, :not(li) > ul';
     var LIMIT_COMMENTS = 4;
 
     // Generate template for a comment
