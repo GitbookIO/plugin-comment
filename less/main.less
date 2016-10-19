@@ -13,187 +13,172 @@
 
 @highlight-background: linear-gradient(to bottom, rgba(39, 243, 106, 0.1), rgba(39, 243, 106, 0.1));
 
-.book .book-body .page-wrapper .page-inner {
+.Comment-Section {
     position: relative;
-    left:0px;
-    transition: 300ms ease left;
 
-    section.normal {
-        overflow: visible;
+    .Comment-Icon {
+        position: absolute;
+        display: none;
+        z-index: 1;
+        right: -2*@comments-icon-margin;
+        top: 0px;
+        bottom: 0px;
+        width: (@comments-icon-width + 2*@comments-icon-margin);
+
+        .Comment-Marker {
+            background: #eee;
+            padding: 4px;
+            cursor: pointer;
+            width: @comments-icon-width;
+            float: right;
+            font-size: @comment-font-size;
+            height: @comments-icon-width;
+            line-height: (@comments-icon-width - 8);
+            text-align: center;
+            border-radius: 3px;
+            color: #555;
+            user-select: none;
+            -webkit-user-select: none;
+
+            &:hover {
+                background: #ddd;
+            }
+        }
     }
 
-    .comments-section {
-        position: relative;
+    &.Has-Comments, &:hover {
+        .Comment-Icon {
+            display: block;
+        }
+    }
 
-        .comments-icon {
-            position: absolute;
-            display: none;
-            z-index: 1;
-            right: -2*@comments-icon-margin;
-            top: 0px;
-            bottom: 0px;
-            width: (@comments-icon-width + 2*@comments-icon-margin);
+    .Comment-CommentsArea {
+        position: absolute;
+        width: @comments-area-width;
+        right: -@comments-column-width;
+        top: 0px;
+        font-size: @comment-font-size;
 
-            .marker {
-                background: #eee;
-                padding: 4px;
-                cursor: pointer;
-                width: @comments-icon-width;
-                float: right;
-                font-size: @comment-font-size;
-                height: @comments-icon-width;
-                line-height: (@comments-icon-width - 8);
-                text-align: center;
-                border-radius: 3px;
-                color: #555;
-                user-select: none;
-                -webkit-user-select: none;
+        input {
+            width: 100%;
+            resize: none;
+            outline: none;
+            border: none;
+            background: transparent;
+            color: inherit;
+            margin: 0px;
+            padding: 0px;
 
-                &:hover {
-                    background: #ddd;
-                }
+            + input {
+                margin-top: 8px;
             }
         }
 
-        .comments-area {
-            position: absolute;
-            display: none;
-            width: @comments-area-width;
-            right: -@comments-column-width;
-            top: 0px;
-            font-size: @comment-font-size;
+        .Comment-Toolbar {
+            margin-top: @comment-padding-v;
 
-            input {
-                width: 100%;
-                resize: none;
-                outline: none;
-                border: none;
-                background: transparent;
-                color: inherit;
-                margin: 0px;
-                padding: 0px;
+            a {
+                display: inline-block;
+                margin-right: 2*@comment-padding-v;
+            }
+        }
 
-                + input {
-                    margin-top: 8px;
+        // List of threads
+        .Comment-ThreadsList {
+            margin-bottom: 15px;
+
+        }
+
+        .Comment-Thread {
+            padding: 0px;
+            padding-bottom: @comment-padding-v;
+            margin-bottom: @comment-padding-v;
+            border-bottom: 1px solid @border-color;
+            cursor: pointer;
+
+            &:hover {
+                .Comment-ThreadTitle {
+                    text-decoration: underline;
                 }
             }
 
+            .Comment-ThreadUser {
+                opacity: @comment-body-opacity;
+            }
+
+            .Comment-ThreadTitle {
+                font-weight: bold;
+            }
+        }
+
+        // List of comments in a thread
+        .comments-list {
+            margin-bottom: 15px;
+
+            // View more toolbar
             .comments-toolbar {
-                margin-top: @comment-padding-v;
+                margin: @comment-padding-v 0px 2*@comment-padding-v;
 
                 a {
-                    display: inline-block;
-                    margin-right: 2*@comment-padding-v;
-                }
-            }
-
-            // List of threads
-            .comments-threads {
-                margin-bottom: 15px;
-
-            }
-
-            .thread {
-                padding: 0px;
-                padding-bottom: @comment-padding-v;
-                margin-bottom: @comment-padding-v;
-                border-bottom: 1px solid @border-color;
-                cursor: pointer;
-
-                &:hover {
-                    .thread-body {
-                        .thread-title {
-                            text-decoration: underline;
-                        }
-                    }
-                }
-
-                .thread-body {
-                    .thread-user {
-                        opacity: @comment-body-opacity;
-                    }
-
-                    .thread-title {
-                        font-weight: bold;
-                    }
-                }
-            }
-
-            // List of comments in a thread
-            .comments-list {
-                margin-bottom: 15px;
-
-                // View more toolbar
-                .comments-toolbar {
-                    margin: @comment-padding-v 0px 2*@comment-padding-v;
-
-                    a {
-                        color: inherit;
-                        opacity: 0.4;
-                    }
-                }
-            }
-
-            .comment {
-                padding: 0px;
-                padding-bottom: @comment-padding-v;
-                margin-bottom: @comment-padding-v;
-                border-bottom: 1px solid @border-color;
-
-                .comment-avatar {
-                    margin-top: 4px;
-                    width: @avatar-size;
-                    height: @avatar-size;
-                    display: block;
-                    overflow: hidden;
-                    border-radius: @avatar-size;
-                    float: left;
-
-                    img {
-                        width: 100%;
-                        height: 100%;
-                    }
-                }
-
-                .comment-body {
-                    margin-left: @avatar-size + @comment-padding-v;
-
-                    .comment-user {
-                        font-weight: bold;
-                        color: inherit;
-                    }
-
-                    .comment-content {
-                        opacity: @comment-body-opacity;
-                    }
+                    color: inherit;
+                    opacity: 0.4;
                 }
             }
         }
 
-        &.has-highlight-comments {
-            background-image: @highlight-background;
-        }
+        .comment {
+            padding: 0px;
+            padding-bottom: @comment-padding-v;
+            margin-bottom: @comment-padding-v;
+            border-bottom: 1px solid @border-color;
 
-        &.has-comments, &:hover {
-            .comments-icon {
+            .comment-avatar {
+                margin-top: 4px;
+                width: @avatar-size;
+                height: @avatar-size;
                 display: block;
-            }
-        }
+                overflow: hidden;
+                border-radius: @avatar-size;
+                float: left;
 
-        &.has-comments-open {
-            background-image: @highlight-background;
-
-            .comments-icon {
-                display: block;
-
-                .marker {
-                    background-image: @highlight-background;
+                img {
+                    width: 100%;
+                    height: 100%;
                 }
             }
 
-            .comments-area {
-                display: block;
+            .comment-body {
+                margin-left: @avatar-size + @comment-padding-v;
+
+                .comment-user {
+                    font-weight: bold;
+                    color: inherit;
+                }
+
+                .comment-content {
+                    opacity: @comment-body-opacity;
+                }
             }
+        }
+    }
+
+    &.Comment-Has-Comments.Comment-Highlight {
+        background-image: @highlight-background;
+    }
+
+    &.Comment-HasComments.Comment-OpenArea {
+        background-image: @highlight-background;
+
+        .Comment-Icon {
+            display: block;
+
+            .Comment-Marker {
+                background-image: @highlight-background;
+            }
+        }
+
+        .Comment-CommentsArea {
+            display: block;
         }
     }
 }
