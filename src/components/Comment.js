@@ -201,9 +201,9 @@ const CommentSection = React.createClass({
         const isOpen = this.uniqueId == openArea;
 
         const className = classNames('Comment-Section', {
-            'Comment-Has-Comments': nbComments > 0,
-            'Comment-Highlight':    highlightCommented,
-            'Comment-OpenArea':     isOpen
+            'Comment-HasComments': nbComments > 0,
+            'Comment-Highlight':   highlightCommented,
+            'Comment-OpenArea':    isOpen
         });
 
         return (
