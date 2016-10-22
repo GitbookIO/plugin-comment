@@ -7,15 +7,29 @@ const ThemeApiState = Record({
     // Fetched threads
     threads: List(),
     // Currently open thread
-    openArea: String()
+    openArea: String(),
+    // Error status
+    error: null,
+    // Request status
+    loading: Boolean()
 });
 
 
 module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), action) => {
     switch (action.type) {
 
-    case ACTIONS_TYPES.UPDATE_THREADS:
-        return state.set('threads', List(action.threads));
+    case ACTIONS_TYPES.THREADS_FETCHING:
+        return state.set('loading', true);
+
+    case ACTIONS_TYPES.THREADS_FETCHED:
+        return state.merge({
+            loading: false,
+            threads: List(action.threads),
+            error:   null
+        });
+
+    case ACTIONS_TYPES.THREADS_ERROR:
+        return state.set('error', action.error);
 
     case ACTIONS_TYPES.OPEN_AREA:
         return state.set('openArea', action.uniqueId);

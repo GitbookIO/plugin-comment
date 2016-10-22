@@ -8,7 +8,7 @@ const actions = require('./actions');
 module.exports = GitBook.createPlugin({
     activate: (dispatch, getState, { Components }) => {
         dispatch(Components.registerComponent(CommentSection, { role: 'html:p' }));
-        dispatch(Components.registerComponent(ThreadsFetcher, { role: 'page:container' }));
+        dispatch(Components.registerComponent(ThreadsFetcher, { role: 'page:wrapper' }));
     },
     reduce,
     actions: {
