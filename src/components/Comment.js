@@ -79,13 +79,17 @@ const Toolbar = React.createClass({
 
 const NewThread = React.createClass({
     propTypes: {
+        page: GitBook.PropTypes.Page
+    },
 
+    componentDidMount() {
+        this.refs.commentInput.focus();
     },
 
     getInitialState() {
         return {
             comment:        '',
-            displayComment: false
+            displayComment: true
         };
     },
 
@@ -107,7 +111,7 @@ const NewThread = React.createClass({
     },
 
     render() {
-        // const {  } = this.props;
+        const { page } = this.props;
         const { displayComment } = this.state;
 
         const toolbarActions = [
@@ -121,9 +125,9 @@ const NewThread = React.createClass({
 
         return (
             <div className="Comment-NewThread">
-                <input type="text" placeholder="Start a new discussion" onChange={this.onTitleChange} />
+                <input type="text" value={page.title} placeholder="Start a new discussion" onChange={this.onTitleChange} />
                 { displayComment ?
-                    <input type="text" placeholder="Optional comment" onChange={this.onCommentChange} />
+                    <input ref="commentInput" type="text" placeholder="Optional comment" onChange={this.onCommentChange} />
                     : null }
                 <Toolbar actions={toolbarActions} />
             </div>
@@ -133,14 +137,15 @@ const NewThread = React.createClass({
 
 const CommentsArea = React.createClass({
     propTypes: {
-        threads: React.PropTypes.array.isRequired
+        threads: React.PropTypes.array.isRequired,
+        page:    GitBook.PropTypes.Page
     },
 
     render() {
-        const { threads } = this.props;
+        const { threads, page } = this.props;
         const inner = threads.length > 1 ?
             <ThreadsList threads={threads} /> :
-            <NewThread />;
+            <NewThread page={page} />;
 
         return (
             <div className="Comment-CommentsArea">
@@ -175,6 +180,7 @@ const CommentSection = React.createClass({
         threads:            React.PropTypes.array.isRequired,
         nbComments:         React.PropTypes.number.isRequired,
         openArea:           React.PropTypes.string,
+        page:               GitBook.PropTypes.Page,
         highlightCommented: React.PropTypes.bool.isRequired
     },
 
@@ -197,7 +203,7 @@ const CommentSection = React.createClass({
 
     render() {
         const { children, threads, nbComments,
-            openArea, highlightCommented } = this.props;
+            openArea, page, highlightCommented } = this.props;
         const isOpen = this.uniqueId == openArea;
 
         const className = classNames('Comment-Section', {
@@ -210,7 +216,7 @@ const CommentSection = React.createClass({
             <div className={className}>
                 { children }
                 { isOpen ?
-                    <CommentsArea threads={threads} />
+                    <CommentsArea threads={threads} page={page} />
                     : null }
                 <Marker nbComments={nbComments} onClick={this.toggleArea} />
             </div>
@@ -234,7 +240,7 @@ function getChildrenToText(children) {
     }).join('');
 }
 
-function mapStateToProps({ comment, config }, props) {
+function mapStateToProps({ comment, config, page }, props) {
     let threads    = comment.get('threads').toJS();
     let nbComments = 0;
 
@@ -273,6 +279,7 @@ function mapStateToProps({ comment, config }, props) {
         threads,
         nbComments,
         openArea: comment.get('openArea'),
+        page: page.toJS(),
         highlightCommented: config.getIn([ 'pluginsConfig', 'comment', 'highlightCommented' ], true)
     };
 }
