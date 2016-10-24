@@ -126,13 +126,13 @@
             }
         }
 
-        .comment {
+        .Comment-Comment {
             padding: 0px;
             padding-bottom: @comment-padding-v;
             margin-bottom: @comment-padding-v;
             border-bottom: 1px solid @border-color;
 
-            .comment-avatar {
+            .Comment-UserAvatar {
                 margin-top: 4px;
                 width: @avatar-size;
                 height: @avatar-size;
@@ -147,15 +147,20 @@
                 }
             }
 
-            .comment-body {
+            .Comment-CommentBody {
                 margin-left: @avatar-size + @comment-padding-v;
 
-                .comment-user {
+                .Comment-CommentUser {
                     font-weight: bold;
                     color: inherit;
                 }
 
-                .comment-content {
+                .Comment-CommentContent {
+                    h6 {
+                        margin-top: 0;
+                        margin-bottom: 0;
+                    }
+
                     opacity: @comment-body-opacity;
                 }
             }
