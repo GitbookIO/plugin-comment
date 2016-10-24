@@ -2,6 +2,8 @@ require('whatwg-fetch');
 const querystring   = require('querystring');
 const ACTIONS_TYPES = require('./types');
 
+const COMMENTS_LIMIT = 4;
+
 /**
  * Get an API full URL given a route and a query
  * @param  {String} route
@@ -143,6 +145,35 @@ function closeThread(number) {
 }
 
 /**
+ * Fetch comments for a thread number
+ */
+function fetchComments(number) {
+    return (dispatch) => {
+        dispatch({
+            type: ACTIONS_TYPES.COMMENTS_FETCHING,
+            number
+        });
+
+        return apiRequest(
+            'GET',
+            `discussions/${number}/comments`,
+            {
+                limit: COMMENTS_LIMIT
+            },
+            ACTIONS_TYPES.COMMENTS_FETCHING_ERROR,
+            dispatch
+        )
+        .then((result) => {
+            dispatch({
+                type: ACTIONS_TYPES.COMMENTS_FETCHED,
+                comments: result.list,
+                number
+            });
+        });
+    };
+}
+
+/**
  * Update user logged in status
  * @param  {Boolean} loggedIn
  * @return {Action}
@@ -176,6 +207,7 @@ function closeArea() {
 module.exports = {
     fetchThreads,
     closeThread,
+    fetchComments,
     updateUserStatus,
     openArea,
     closeArea

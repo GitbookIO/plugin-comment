@@ -1,11 +1,13 @@
 const GitBook = require('gitbook-core');
-const { Record, List } = GitBook.Immutable;
+const { Record, List, Map } = GitBook.Immutable;
 
 const ACTIONS_TYPES = require('../actions/types');
 
 const ThemeApiState = Record({
     // Fetched threads
     threads: List(),
+    // Fetched comments
+    comments: Map(),
     // Currently open thread
     openArea: String(),
     // Error status
@@ -20,6 +22,7 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
 
     case ACTIONS_TYPES.THREADS_FETCHING:
     case ACTIONS_TYPES.THREAD_CLOSING:
+    case ACTIONS_TYPES.COMMENTS_FETCHING:
         return state.set('loading', true);
 
     case ACTIONS_TYPES.THREADS_FETCHED:
@@ -33,8 +36,13 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
         const threads = state.get('threads').filterNot(thread => thread.number == action.number);
         return state.set('threads', threads);
 
+    case ACTIONS_TYPES.COMMENTS_FETCHED:
+        const comments = state.get('comments').set(action.number, List(action.comments));
+        return state.set('comments', comments);
+
     case ACTIONS_TYPES.THREADS_FETCHING_ERROR:
     case ACTIONS_TYPES.THREAD_CLOSING_ERROR:
+    case ACTIONS_TYPES.COMMENTS_FETCHING_ERROR:
         return state.set('error', action.error);
 
     case ACTIONS_TYPES.OPEN_AREA:

@@ -3,47 +3,10 @@ const GitBook    = require('gitbook-core');
 const { React }  = GitBook;
 const classNames = require('classnames');
 const uuid       = require('uuid');
-const actions    = require('../actions');
 
-const Comment = React.createClass({
-    propTypes: {
-        comment: React.PropTypes.object.isRequired
-    },
-
-    createBody() {
-        const { comment } = this.props;
-        return {
-            __html: comment.body
-        };
-    },
-
-    render() {
-        const { comment } = this.props;
-
-        let title = null;
-        if (Boolean(comment.title)) {
-            title = <h6>{comment.title}</h6>;
-        }
-
-        let body = null;
-        if (Boolean(comment.body)) {
-            body = <div dangerouslySetInnerHTML={this.createBody()} />;
-        }
-
-        return (
-            <div className="Comment-Comment">
-                <img className="Comment-UserAvatar" src={comment.user.urls.avatar} />
-                <div className="Comment-CommentBody">
-                    <a className="Comment-CommentUser" href={comment.user.urls.profile} target="_blank">{comment.user.name}</a>
-                    <div className="Comment-CommentContent">
-                        {title}
-                        {body}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-});
+const Toolbar        = require('./Toolbar');
+const ThreadComments = require('./ThreadComments');
+const actions        = require('../actions');
 
 const Thread = React.createClass({
     propTypes: {
@@ -75,21 +38,6 @@ const ThreadsList = React.createClass({
         return (
             <div className="Comment-ThreadsList">
                 { threads.map((thread, i) => <Thread key={i} thread={thread} />) }
-            </div>
-        );
-    }
-});
-
-const Toolbar = React.createClass({
-    propTypes: {
-        actions: React.PropTypes.array
-    },
-
-    render() {
-        const toolbarActions = this.props.actions;
-        return (
-            <div className="Comment-Toolbar">
-                { toolbarActions.map((action, i) => <a key={i} href="#" onClick={(e) => { e.preventDefault(); action.onClick(); }}>{action.text}</a>)}
             </div>
         );
     }
@@ -151,70 +99,19 @@ const NewThread = React.createClass({
     }
 });
 
-const Comments = React.createClass({
-    propTypes: {
-        comments: React.PropTypes.array
-    },
-
-    render() {
-        return (
-            <div className="Comment-CommentsList">
-
-            </div>
-        );
-    }
-});
-
-const ThreadComments = React.createClass({
-    propTypes: {
-        dispatch: React.PropTypes.func.isRequired,
-        thread:   React.PropTypes.object
-    },
-
-    render() {
-        const { dispatch, thread } = this.props;
-
-        const toolbarActions = [
-            {
-                text: 'Comment',
-                onClick: () => {}
-            },
-            {
-                text: 'Close',
-                onClick: () => {
-                    dispatch(actions.closeThread(thread.number));
-                }
-            },
-            {
-                text: 'New Thread',
-                onClick: () => {}
-            }
-        ];
-
-        return (
-            <div>
-                <Comment comment={thread} />
-                <Comments />
-                <Toolbar actions={toolbarActions} />
-            </div>
-        );
-    }
-});
-
 const CommentsArea = React.createClass({
     propTypes: {
-        dispatch: React.PropTypes.func.isRequired,
-        threads:  React.PropTypes.array.isRequired,
-        page:     GitBook.PropTypes.Page
+        threads: React.PropTypes.array.isRequired,
+        page:    GitBook.PropTypes.Page
     },
 
     render() {
-        const { dispatch, threads, page } = this.props;
+        const { threads, page } = this.props;
 
         const inner = threads.length > 1 ?
             <ThreadsList threads={threads} /> :
             threads.length == 1 ?
-            <ThreadComments thread={threads[0]} dispatch={dispatch} /> :
+            <ThreadComments thread={threads[0]} /> :
             <NewThread page={page} />;
 
         return (
@@ -272,7 +169,7 @@ const CommentSection = React.createClass({
     },
 
     render() {
-        const { dispatch, children, threads, nbComments,
+        const { children, threads, nbComments,
             openArea, page, highlightCommented } = this.props;
         const isOpen = this.uniqueId == openArea;
 
@@ -286,7 +183,7 @@ const CommentSection = React.createClass({
             <div className={className}>
                 { children }
                 { isOpen ?
-                    <CommentsArea threads={threads} page={page} dispatch={dispatch} />
+                    <CommentsArea threads={threads} page={page} />
                     : null }
                 <Marker nbComments={nbComments} onClick={this.toggleArea} />
             </div>
