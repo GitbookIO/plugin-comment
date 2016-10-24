@@ -10,8 +10,25 @@ const Comment = React.createClass({
         comment: React.PropTypes.object.isRequired
     },
 
+    createBody() {
+        const { comment } = this.props;
+        return {
+            __html: comment.body
+        };
+    },
+
     render() {
         const { comment } = this.props;
+
+        let title = null;
+        if (Boolean(comment.title)) {
+            title = <h6>{comment.title}</h6>;
+        }
+
+        let body = null;
+        if (Boolean(comment.body)) {
+            body = <div dangerouslySetInnerHTML={this.createBody()} />;
+        }
 
         return (
             <div className="Comment-Comment">
@@ -19,7 +36,8 @@ const Comment = React.createClass({
                 <div className="Comment-CommentBody">
                     <a className="Comment-CommentUser" href={comment.user.urls.profile} target="_blank">{comment.user.name}</a>
                     <div className="Comment-CommentContent">
-
+                        {title}
+                        {body}
                     </div>
                 </div>
             </div>
@@ -71,7 +89,7 @@ const Toolbar = React.createClass({
         const toolbarActions = this.props.actions;
         return (
             <div className="Comment-Toolbar">
-                { toolbarActions.map((action, i) => <a key={i} href="#" onClick={action.onClick}>{action.text}</a>)}
+                { toolbarActions.map((action, i) => <a key={i} href="#" onClick={(e) => { e.preventDefault(); action.onClick(); }}>{action.text}</a>)}
             </div>
         );
     }
@@ -117,9 +135,7 @@ const NewThread = React.createClass({
         const toolbarActions = [
             {
                 text: 'Post',
-                onClick: (e) => {
-                    e.preventDefault();
-                }
+                onClick: () => {}
             }
         ];
 
@@ -135,16 +151,70 @@ const NewThread = React.createClass({
     }
 });
 
-const CommentsArea = React.createClass({
+const Comments = React.createClass({
     propTypes: {
-        threads: React.PropTypes.array.isRequired,
-        page:    GitBook.PropTypes.Page
+        comments: React.PropTypes.array
     },
 
     render() {
-        const { threads, page } = this.props;
+        return (
+            <div className="Comment-CommentsList">
+
+            </div>
+        );
+    }
+});
+
+const ThreadComments = React.createClass({
+    propTypes: {
+        dispatch: React.PropTypes.func.isRequired,
+        thread:   React.PropTypes.object
+    },
+
+    render() {
+        const { dispatch, thread } = this.props;
+
+        const toolbarActions = [
+            {
+                text: 'Comment',
+                onClick: () => {}
+            },
+            {
+                text: 'Close',
+                onClick: () => {
+                    dispatch(actions.closeThread(thread.number));
+                }
+            },
+            {
+                text: 'New Thread',
+                onClick: () => {}
+            }
+        ];
+
+        return (
+            <div>
+                <Comment comment={thread} />
+                <Comments />
+                <Toolbar actions={toolbarActions} />
+            </div>
+        );
+    }
+});
+
+const CommentsArea = React.createClass({
+    propTypes: {
+        dispatch: React.PropTypes.func.isRequired,
+        threads:  React.PropTypes.array.isRequired,
+        page:     GitBook.PropTypes.Page
+    },
+
+    render() {
+        const { dispatch, threads, page } = this.props;
+
         const inner = threads.length > 1 ?
             <ThreadsList threads={threads} /> :
+            threads.length == 1 ?
+            <ThreadComments thread={threads[0]} dispatch={dispatch} /> :
             <NewThread page={page} />;
 
         return (
@@ -202,7 +272,7 @@ const CommentSection = React.createClass({
     },
 
     render() {
-        const { children, threads, nbComments,
+        const { dispatch, children, threads, nbComments,
             openArea, page, highlightCommented } = this.props;
         const isOpen = this.uniqueId == openArea;
 
@@ -216,7 +286,7 @@ const CommentSection = React.createClass({
             <div className={className}>
                 { children }
                 { isOpen ?
-                    <CommentsArea threads={threads} page={page} />
+                    <CommentsArea threads={threads} page={page} dispatch={dispatch} />
                     : null }
                 <Marker nbComments={nbComments} onClick={this.toggleArea} />
             </div>
