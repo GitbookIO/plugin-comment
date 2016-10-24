@@ -19,6 +19,7 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
     switch (action.type) {
 
     case ACTIONS_TYPES.THREADS_FETCHING:
+    case ACTIONS_TYPES.THREAD_CLOSING:
         return state.set('loading', true);
 
     case ACTIONS_TYPES.THREADS_FETCHED:
@@ -28,7 +29,12 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
             error:   null
         });
 
-    case ACTIONS_TYPES.THREADS_ERROR:
+    case ACTIONS_TYPES.THREAD_CLOSED:
+        const threads = state.get('threads').filterNot(thread => thread.number == action.number);
+        return state.set('threads', threads);
+
+    case ACTIONS_TYPES.THREADS_FETCHING_ERROR:
+    case ACTIONS_TYPES.THREAD_CLOSING_ERROR:
         return state.set('error', action.error);
 
     case ACTIONS_TYPES.OPEN_AREA:

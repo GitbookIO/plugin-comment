@@ -3,46 +3,141 @@ const querystring   = require('querystring');
 const ACTIONS_TYPES = require('./types');
 
 /**
- * Fetch threads for a page
+ * Get an API full URL given a route and a query
+ * @param  {String} route
+ * @param  {Object} q
+ * @return {String}
  */
-function fetchThreads(filename) {
-    const query = {
-        state: 'open',
-        filename
+function getApiURL(route, q) {
+    let query = '';
+    if (Boolean(q)) {
+        query = `?${querystring.stringify(q)}`;
+    }
+
+    return `http://localhost:5000/api/book/jpreynat/the-history-of-computers/${route}${query}`;
+}
+
+/**
+ * Perform an API request
+ * @param  {String} method
+ * @param  {String} route
+ * @param  {Object} data
+ * @param  {String} errorType
+ * @param  {Function} dispatch
+ * @return {Promise}
+ */
+function apiRequest(method, route, data, errorType, dispatch) {
+    let apiURL;
+    let options;
+    const headers = {
+        'Accept': 'application/json'
     };
 
-    // const apiURL = `${window.location.origin}/gitbook/api/discussions?${querystring.stringify(query)}`;
-    const apiURL = `http://localhost:5000/api/book/jpreynat/the-history-of-computers/discussions?${querystring.stringify(query)}`;
+    // Create correct URL and fetch options depending on method type
+    if (method == 'GET') {
+        apiURL = getApiURL(route, data);
+        options = Object.assign({}, {
+            method,
+            headers
+        });
+    }
+    else {
+        apiURL = getApiURL(route);
+        options = Object.assign({}, {
+            method,
+            headers: Object.assign({}, headers, {
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(data)
+        });
+    }
 
-    return (dispatch, getState, actions) => {
-        dispatch({ type: ACTIONS_TYPES.THREADS_FETCHING, filename });
+    return fetch(apiURL, options)
+    .then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+            const loggedIn = Boolean(response.headers.get('X-GitBook-Auth'));
+            dispatch({
+                type: ACTIONS_TYPES.UPDATE_USER_STATUS,
+                loggedIn
+            });
+        }
+        else {
+            const error = new Error(response.statusText);
+            error.response = response;
 
-        return fetch(apiURL, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then((response) => {
-            if (response.status >= 200 && response.status < 300) {
-                const loggedIn = Boolean(response.headers.get('X-GitBook-Auth'));
-                dispatch(updateUserStatus(loggedIn));
-            }
-            else {
-                const error = new Error(response.statusText);
-                error.response = response;
-                throw error;
-            }
-
-            return response;
-        })
-        .then(response => response.json())
-        .then(result => dispatch({ type: ACTIONS_TYPES.THREADS_FETCHED, threads: result.list }))
-        .catch((err) => {
-            alert(`Error with inline comments: ${err.message}`);
+            alert(`Error with inline comments: ${error.message}`);
             // eslint-disable-next-line no-console
-            console.log(err);
-            dispatch({ type: ACTIONS_TYPES.THREADS_ERROR, error: err });
+            console.log(error);
+            dispatch({
+                type: errorType,
+                error
+            });
+
+            throw error;
+        }
+
+        return response;
+    })
+    .then(response => response.json());
+}
+
+/**
+ * Fetch threads for a page
+ * @param  {String} filename
+ * @return {Action}
+ */
+function fetchThreads(filename) {
+    return (dispatch) => {
+        dispatch({
+            type: ACTIONS_TYPES.THREADS_FETCHING,
+            filename
+        });
+
+        return apiRequest(
+            'GET',
+            'discussions',
+            {
+                state: 'open',
+                filename
+            },
+            ACTIONS_TYPES.THREADS_FETCHING_ERROR,
+            dispatch
+        )
+        .then((result) => {
+            dispatch({
+                type: ACTIONS_TYPES.THREADS_FETCHED,
+                threads: result.list
+            });
+        });
+    };
+}
+
+/**
+ * Close a thread
+ * @param  {Number} number
+ * @return {Action}
+ */
+function closeThread(number) {
+    return (dispatch) => {
+        dispatch({
+            type: ACTIONS_TYPES.THREAD_CLOSING,
+            number
+        });
+
+        return apiRequest(
+            'POST',
+            `discussions/${number}`,
+            {
+                state: 'closed'
+            },
+            ACTIONS_TYPES.THREAD_CLOSING_ERROR,
+            dispatch
+        )
+        .then(() => {
+            dispatch({
+                type: ACTIONS_TYPES.THREAD_CLOSED,
+                number
+            });
         });
     };
 }
@@ -53,10 +148,7 @@ function fetchThreads(filename) {
  * @return {Action}
  */
 function updateUserStatus(loggedIn) {
-    return {
-        type: ACTIONS_TYPES.UPDATE_USER_STATUS,
-        loggedIn
-    };
+    return ;
 }
 
 /**
@@ -83,6 +175,7 @@ function closeArea() {
 
 module.exports = {
     fetchThreads,
+    closeThread,
     updateUserStatus,
     openArea,
     closeArea
