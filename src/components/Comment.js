@@ -8,6 +8,17 @@ const Toolbar        = require('./Toolbar');
 const ThreadComments = require('./ThreadComments');
 const actions        = require('../actions');
 
+/**
+ * Return number of comments given an array of threads
+ * @param  {Array<Thread>} threads
+ * @return {Number}
+ */
+function getNbComments(threads) {
+    return threads.reduce((total, thread) => {
+        return total + thread.comments + 1;
+    }, 0);
+}
+
 const Thread = React.createClass({
     propTypes: {
         thread: React.PropTypes.object.isRequired
@@ -124,12 +135,14 @@ const CommentsArea = React.createClass({
 
 const Marker = React.createClass({
     propTypes: {
-        nbComments: React.PropTypes.number.isRequired,
-        onClick:    React.PropTypes.func.isRequired
+        threads: React.PropTypes.array.isRequired,
+        onClick: React.PropTypes.func.isRequired
     },
 
     render() {
-        const { nbComments, onClick } = this.props;
+        const { threads, onClick } = this.props;
+        const nbComments = getNbComments(threads);
+
         return (
             <div className="Comment-Icon" onClick={onClick}>
                 <div className="Comment-Marker">
@@ -145,7 +158,6 @@ const CommentSection = React.createClass({
         children:           React.PropTypes.node.isRequired,
         dispatch:           React.PropTypes.func.isRequired,
         threads:            React.PropTypes.array.isRequired,
-        nbComments:         React.PropTypes.number.isRequired,
         openArea:           React.PropTypes.string,
         page:               GitBook.PropTypes.Page,
         highlightCommented: React.PropTypes.bool.isRequired
@@ -169,9 +181,11 @@ const CommentSection = React.createClass({
     },
 
     render() {
-        const { children, threads, nbComments,
-            openArea, page, highlightCommented } = this.props;
+        const { children, threads, openArea,
+            page, highlightCommented } = this.props;
+
         const isOpen = this.uniqueId == openArea;
+        const nbComments = getNbComments(threads);
 
         const className = classNames('Comment-Section', {
             'Comment-HasComments': nbComments > 0,
@@ -209,7 +223,6 @@ function getChildrenToText(children) {
 
 function mapStateToProps({ comment, config, page }, props) {
     let threads    = comment.get('threads').toJS();
-    let nbComments = 0;
 
     // Return only threads corresponding to content
     const { children } = props;
@@ -233,18 +246,11 @@ function mapStateToProps({ comment, config, page }, props) {
             + (commonWordsFromSection.length / words.length)
         ) / 2;
 
-        if (matching > 0.8) {
-            nbComments += thread.comments + 1;
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (matching > 0.8);
     });
 
     return {
         threads,
-        nbComments,
         openArea: comment.get('openArea'),
         page: page.toJS(),
         highlightCommented: config.getIn([ 'pluginsConfig', 'comment', 'highlightCommented' ], true)
