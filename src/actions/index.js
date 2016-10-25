@@ -115,6 +115,45 @@ function fetchThreads(filename) {
 }
 
 /**
+ * Post a thread
+ * @param  {String} title
+ * @param  {String} body
+ * @param  {String} chapterTitle
+ * @param  {String} filename
+ * @param  {String} section
+ * @return {Action}
+ */
+function postThread(title, body, chapterTitle, filename, section) {
+    return (dispatch) => {
+        dispatch({
+            type: ACTIONS_TYPES.THREAD_POSTING
+        });
+
+        return apiRequest(
+            'POST',
+            'discussions',
+            {
+                title,
+                body,
+                context: {
+                    filename,
+                    chapterTitle,
+                    section
+                }
+            },
+            ACTIONS_TYPES.THREAD_POSTING_ERROR,
+            dispatch
+        )
+        .then((result) => {
+            dispatch({
+                type: ACTIONS_TYPES.THREAD_POSTED,
+                thread: result
+            });
+        });
+    };
+}
+
+/**
  * Close a thread
  * @param  {Number} number
  * @return {Action}
@@ -209,6 +248,7 @@ function closeArea() {
 
 module.exports = {
     fetchThreads,
+    postThread,
     closeThread,
     fetchComments,
     updateUserStatus,

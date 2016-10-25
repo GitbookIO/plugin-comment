@@ -4,7 +4,7 @@ const { React }  = GitBook;
 const classNames = require('classnames');
 const uuid       = require('uuid');
 
-const Toolbar        = require('./Toolbar');
+const NewThread      = require('./NewThread');
 const ThreadComments = require('./ThreadComments');
 const actions        = require('../actions');
 
@@ -54,76 +54,20 @@ const ThreadsList = React.createClass({
     }
 });
 
-const NewThread = React.createClass({
-    propTypes: {
-        page: GitBook.PropTypes.Page
-    },
-
-    componentDidMount() {
-        this.refs.commentInput.focus();
-    },
-
-    getInitialState() {
-        return {
-            comment:        '',
-            displayComment: true
-        };
-    },
-
-    onCommentChange(e) {
-        const comment = e.target.value;
-        this.setState({ comment });
-    },
-
-    onTitleChange(e) {
-        const { comment } = this.state;
-
-        const title = e.target.value;
-        if (title.length > 5) {
-            this.setState({ displayComment: true });
-        }
-        else if (!comment.length) {
-            this.setState({ displayComment: false });
-        }
-    },
-
-    render() {
-        const { page } = this.props;
-        const { displayComment } = this.state;
-
-        const toolbarActions = [
-            {
-                text: 'Post',
-                onClick: () => {}
-            }
-        ];
-
-        return (
-            <div className="Comment-NewThread">
-                <input type="text" value={page.title} placeholder="Start a new discussion" onChange={this.onTitleChange} />
-                { displayComment ?
-                    <input ref="commentInput" type="text" placeholder="Optional comment" onChange={this.onCommentChange} />
-                    : null }
-                <Toolbar actions={toolbarActions} />
-            </div>
-        );
-    }
-});
-
 const CommentsArea = React.createClass({
     propTypes: {
-        threads: React.PropTypes.array.isRequired,
-        page:    GitBook.PropTypes.Page
+        threads:     React.PropTypes.array.isRequired,
+        sectionText: React.PropTypes.string.isRequired
     },
 
     render() {
-        const { threads, page } = this.props;
+        const { threads, sectionText } = this.props;
 
         const inner = threads.length > 1 ?
             <ThreadsList threads={threads} /> :
             threads.length == 1 ?
             <ThreadComments thread={threads[0]} /> :
-            <NewThread page={page} />;
+            <NewThread sectionText={sectionText} />;
 
         return (
             <div className="Comment-CommentsArea">
@@ -158,8 +102,8 @@ const CommentSection = React.createClass({
         children:           React.PropTypes.node.isRequired,
         dispatch:           React.PropTypes.func.isRequired,
         threads:            React.PropTypes.array.isRequired,
+        sectionText:        React.PropTypes.string.isRequired,
         openArea:           React.PropTypes.string,
-        page:               GitBook.PropTypes.Page,
         highlightCommented: React.PropTypes.bool.isRequired
     },
 
@@ -181,8 +125,8 @@ const CommentSection = React.createClass({
     },
 
     render() {
-        const { children, threads, openArea,
-            page, highlightCommented } = this.props;
+        const { children, threads, sectionText,
+            openArea, highlightCommented } = this.props;
 
         const isOpen = this.uniqueId == openArea;
         const nbComments = getNbComments(threads);
@@ -196,9 +140,9 @@ const CommentSection = React.createClass({
         return (
             <div className={className}>
                 { children }
-                { isOpen ?
-                    <CommentsArea threads={threads} page={page} />
-                    : null }
+            { isOpen ?
+                <CommentsArea threads={threads} sectionText={sectionText} />
+                : null }
                 <Marker nbComments={nbComments} onClick={this.toggleArea} />
             </div>
         );
@@ -221,14 +165,14 @@ function getChildrenToText(children) {
     }).join('');
 }
 
-function mapStateToProps({ comment, config, page }, props) {
-    let threads    = comment.get('threads').toJS();
+function mapStateToProps({ comment, config }, props) {
+    let threads = comment.get('threads').toJS();
 
     // Return only threads corresponding to content
     const { children } = props;
 
-    const text  = getChildrenToText(children);
-    const words = text.split(' ');
+    const sectionText = getChildrenToText(children);
+    const words       = sectionText.split(' ');
 
     threads = threads.filter((thread) => {
         // Compute matching for threads
@@ -251,8 +195,8 @@ function mapStateToProps({ comment, config, page }, props) {
 
     return {
         threads,
+        sectionText,
         openArea: comment.get('openArea'),
-        page: page.toJS(),
         highlightCommented: config.getIn([ 'pluginsConfig', 'comment', 'highlightCommented' ], true)
     };
 }
