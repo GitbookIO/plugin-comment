@@ -1,8 +1,7 @@
 module.exports = {
-    OPEN_AREA:               'comment/area/open',
-    CLOSE_AREA:              'comment/area/close',
-    UPDATE_THREADS:          'comment/threads/update',
-    UPDATE_USER_STATUS:      'comment/user/status/update',
+    AREA_OPEN:               'comment/area/open',
+    AREA_CLOSE:              'comment/area/close',
+    USER_STATUS_UPDATE:      'comment/user/status/update',
     THREADS_FETCHING:        'comment/threads/fetch/begin',
     THREADS_FETCHED:         'comment/threads/fetch/success',
     THREADS_FETCHING_ERROR:  'comment/threads/fetch/error',

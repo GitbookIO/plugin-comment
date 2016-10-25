@@ -179,7 +179,10 @@ function fetchComments(number) {
  * @return {Action}
  */
 function updateUserStatus(loggedIn) {
-    return ;
+    return {
+        type: ACTIONS_TYPES.USER_STATUS_UPDATE,
+        loggedIn
+    };
 }
 
 /**
@@ -189,7 +192,7 @@ function updateUserStatus(loggedIn) {
  */
 function openArea(uniqueId) {
     return {
-        type: ACTIONS_TYPES.OPEN_AREA,
+        type: ACTIONS_TYPES.AREA_OPEN,
         uniqueId
     };
 }
@@ -200,7 +203,7 @@ function openArea(uniqueId) {
  */
 function closeArea() {
     return {
-        type: ACTIONS_TYPES.CLOSE_AREA
+        type: ACTIONS_TYPES.AREA_CLOSE
     };
 }
 

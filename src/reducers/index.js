@@ -13,7 +13,9 @@ const ThemeApiState = Record({
     // Error status
     error: null,
     // Request status
-    loading: Boolean()
+    loading: Boolean(),
+    // Is user logged in
+    loggedIn: Boolean()
 });
 
 
@@ -45,10 +47,13 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
     case ACTIONS_TYPES.COMMENTS_FETCHING_ERROR:
         return state.set('error', action.error);
 
-    case ACTIONS_TYPES.OPEN_AREA:
+    case ACTIONS_TYPES.USER_STATUS_UPDATE:
+        return state.set('loggedIn', action.loggedIn);
+
+    case ACTIONS_TYPES.AREA_OPEN:
         return state.set('openArea', action.uniqueId);
 
-    case ACTIONS_TYPES.CLOSE_AREA:
+    case ACTIONS_TYPES.AREA_CLOSE:
         return state.set('openArea', '');
 
     default:
