@@ -59,7 +59,7 @@ function apiRequest(method, route, data, errorType, dispatch) {
         if (response.status >= 200 && response.status < 300) {
             const loggedIn = Boolean(response.headers.get('X-GitBook-Auth'));
             dispatch({
-                type: ACTIONS_TYPES.UPDATE_USER_STATUS,
+                type: ACTIONS_TYPES.USER_STATUS_UPDATE,
                 loggedIn
             });
         }
