@@ -143,7 +143,7 @@ const CommentSection = React.createClass({
             { isOpen ?
                 <CommentsArea threads={threads} sectionText={sectionText} />
                 : null }
-                <Marker nbComments={nbComments} onClick={this.toggleArea} />
+                <Marker threads={threads} onClick={this.toggleArea} />
             </div>
         );
     }
