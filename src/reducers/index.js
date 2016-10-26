@@ -26,6 +26,7 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
     case ACTIONS_TYPES.THREAD_POSTING:
     case ACTIONS_TYPES.THREAD_CLOSING:
     case ACTIONS_TYPES.COMMENTS_FETCHING:
+    case ACTIONS_TYPES.COMMENT_POSTING:
         return state.set('loading', true);
 
     case ACTIONS_TYPES.THREADS_FETCHED:
@@ -44,10 +45,14 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
     case ACTIONS_TYPES.COMMENTS_FETCHED:
         return state.set('comments', state.get('comments').set(action.number, List(action.comments)));
 
+    case ACTIONS_TYPES.COMMENT_POSTED:
+        return state.set('comments', state.get('comments').set(action.number, state.get('comments').get(action.number).unshift(action.comment)));
+
     case ACTIONS_TYPES.THREADS_FETCHING_ERROR:
     case ACTIONS_TYPES.THREAD_POSTING_ERROR:
     case ACTIONS_TYPES.THREAD_CLOSING_ERROR:
     case ACTIONS_TYPES.COMMENTS_FETCHING_ERROR:
+    case ACTIONS_TYPES.COMMENT_POSTING_ERROR:
         return state.set('error', action.error);
 
     case ACTIONS_TYPES.USER_STATUS_UPDATE:

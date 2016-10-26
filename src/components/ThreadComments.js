@@ -7,9 +7,9 @@ const actions = require('../actions');
 
 const CommentForm = React.createClass({
     propTypes: {
-        dispatch:  React.PropTypes.func.isRequired,
-        onDiscard: React.PropTypes.func.isRequired,
-        thread:    React.PropTypes.object.isRequired
+        dispatch: React.PropTypes.func.isRequired,
+        onClose:  React.PropTypes.func.isRequired,
+        thread:   React.PropTypes.object.isRequired
     },
 
     componentDidMount() {
@@ -17,19 +17,19 @@ const CommentForm = React.createClass({
     },
 
     render() {
-        const { dispatch, onDiscard, thread } = this.props;
+        const { dispatch, onClose, thread } = this.props;
         const toolbarActions = [
             {
                 text: 'Post',
                 onClick: () => {
-                    dispatch(actions.postComment(thread.number, this.refs.bodyInput.value));
+                    // Add comment and close form
+                    dispatch(actions.postComment(thread.number, this.refs.bodyInput.value))
+                    .then(onClose);
                 }
             },
             {
                 text: 'Discard',
-                onClick: () => {
-                    onDiscard();
-                }
+                onClick: onClose
             }
         ];
 
@@ -102,8 +102,7 @@ const ThreadComments = React.createClass({
     propTypes: {
         dispatch:    React.PropTypes.func.isRequired,
         thread:      React.PropTypes.object.isRequired,
-        comments:    React.PropTypes.array,
-        sectionText: React.PropTypes.string.isRequired
+        comments:    React.PropTypes.array
     },
 
     getInitialState() {
@@ -118,7 +117,7 @@ const ThreadComments = React.createClass({
 
     componentDidMount() {
         const { dispatch, thread } = this.props;
-        dispatch(actions.fetchComments(thread.number.toString()));
+        dispatch(actions.fetchComments(thread.number));
     },
 
     render() {
@@ -151,7 +150,7 @@ const ThreadComments = React.createClass({
                 <Comment comment={thread} />
                 <Comments comments={comments} />
             {creatingComment ?
-                <CommentForm thread={thread} dispatch={dispatch} onDiscard={this.closeForm} />
+                <CommentForm thread={thread} dispatch={dispatch} onClose={this.closeForm} />
                 :
                 <Toolbar actions={toolbarActions} />
             }
@@ -164,7 +163,7 @@ function mapStateToProps({ comment, config, page }, props) {
     const { thread } = props;
 
     return {
-        comments: (comment.get('comments').get(thread.number.toString()) || new List()).toJS()
+        comments: (comment.get('comments').get(thread.number) || new List()).toJS()
     };
 }
 

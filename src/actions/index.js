@@ -170,6 +170,8 @@ function closeThread(number) {
 
 /**
  * Fetch comments for a thread number
+ * @param  {Number} number
+ * @return {Action}
  */
 function fetchComments(number) {
     return (dispatch) => {
@@ -192,6 +194,38 @@ function fetchComments(number) {
                 type: ACTIONS_TYPES.COMMENTS_FETCHED,
                 comments: result.list,
                 number
+            });
+        });
+    };
+}
+
+/**
+ * Post a comment on an existing thread
+ * @param  {Number} number
+ * @param  {String} body
+ * @return {Action}
+ */
+function postComment(number, body) {
+    return (dispatch) => {
+        dispatch({
+            type: ACTIONS_TYPES.COMMENT_POSTING,
+            number
+        });
+
+        return apiRequest(
+            'POST',
+            `discussions/${number}/comments`,
+            {
+                body
+            },
+            ACTIONS_TYPES.COMMENT_POSTING_ERROR,
+            dispatch
+        )
+        .then((comment) => {
+            dispatch({
+                type: ACTIONS_TYPES.COMMENT_POSTED,
+                number,
+                comment
             });
         });
     };
@@ -236,6 +270,7 @@ module.exports = {
     postThread,
     closeThread,
     fetchComments,
+    postComment,
     updateUserStatus,
     openArea,
     closeArea

@@ -13,5 +13,8 @@ module.exports = {
     THREAD_CLOSING_ERROR:    'comment/thread/close/error',
     COMMENTS_FETCHING:       'comment/comments/fetch/begin',
     COMMENTS_FETCHED:        'comment/comments/fetch/success',
-    COMMENTS_FETCHING_ERROR: 'comment/comments/fetch/error'
+    COMMENTS_FETCHING_ERROR: 'comment/comments/fetch/error',
+    COMMENT_POSTING:         'comment/comment/post/begin',
+    COMMENT_POSTED:          'comment/comment/post/success',
+    COMMENT_POSTING_ERROR:   'comment/comment/post/error'
 };
