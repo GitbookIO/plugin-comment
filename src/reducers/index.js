@@ -9,7 +9,7 @@ const ThemeApiState = Record({
     // Fetched comments
     comments: Map(),
     // Currently open thread
-    openArea: String(),
+    openArea: null,
     // Error status
     error: null,
     // Request status
@@ -57,7 +57,7 @@ module.exports = GitBook.createReducer('comment', (state = ThemeApiState(), acti
         return state.set('openArea', action.uniqueId);
 
     case ACTIONS_TYPES.AREA_CLOSE:
-        return state.set('openArea', '');
+        return state.set('openArea', null);
 
     default:
         return state;

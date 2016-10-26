@@ -211,7 +211,7 @@ function updateUserStatus(loggedIn) {
 
 /**
  * Update currently open comments area id
- * @param  {String} markerId
+ * @param  {Number} uniqueId
  * @return {Action}
  */
 function openArea(uniqueId) {

@@ -2,11 +2,13 @@ require('whatwg-fetch');
 const GitBook    = require('gitbook-core');
 const { React }  = GitBook;
 const classNames = require('classnames');
-const uuid       = require('uuid');
 
 const NewThread      = require('./NewThread');
 const ThreadComments = require('./ThreadComments');
 const actions        = require('../actions');
+
+// Unique Id for CommentSection components
+let uniqueId = 0;
 
 /**
  * Return number of comments given an array of threads
@@ -103,14 +105,12 @@ const CommentSection = React.createClass({
         dispatch:           React.PropTypes.func.isRequired,
         threads:            React.PropTypes.array.isRequired,
         sectionText:        React.PropTypes.string.isRequired,
-        openArea:           React.PropTypes.string,
+        openArea:           React.PropTypes.number,
         highlightCommented: React.PropTypes.bool.isRequired
     },
 
     componentDidMount() {
-        if (typeof window != 'undefined') {
-            this.uniqueId = uuid.v4();
-        }
+        this.uniqueId = ++uniqueId;
     },
 
     toggleArea() {
@@ -128,7 +128,7 @@ const CommentSection = React.createClass({
         const { children, threads, sectionText,
             openArea, highlightCommented } = this.props;
 
-        const isOpen = this.uniqueId == openArea;
+        const isOpen = Boolean(openArea) && (this.uniqueId == openArea);
         const nbComments = getNbComments(threads);
 
         const className = classNames('Comment-Section', {
