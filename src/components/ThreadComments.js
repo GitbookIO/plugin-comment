@@ -2,8 +2,9 @@ const GitBook   = require('gitbook-core');
 const { React } = GitBook;
 const { List } = GitBook.Immutable;
 
-const Toolbar = require('./Toolbar');
-const actions = require('../actions');
+const CommentCloser = require('./CommentCloser');
+const Toolbar       = require('./Toolbar');
+const actions       = require('../actions');
 
 const CommentForm = React.createClass({
     propTypes: {
@@ -44,7 +45,8 @@ const CommentForm = React.createClass({
 
 const Comment = React.createClass({
     propTypes: {
-        comment: React.PropTypes.object.isRequired
+        comment: React.PropTypes.object.isRequired,
+        onHide:  React.PropTypes.func
     },
 
     createBody() {
@@ -55,7 +57,7 @@ const Comment = React.createClass({
     },
 
     render() {
-        const { comment } = this.props;
+        const { comment, onHide } = this.props;
 
         let title = null;
         if (Boolean(comment.title)) {
@@ -69,6 +71,10 @@ const Comment = React.createClass({
 
         return (
             <div className="Comment-Comment">
+            {Boolean(onHide) ?
+                <CommentCloser onClick={onHide} />
+                : null
+            }
                 <img className="Comment-UserAvatar" src={comment.user.urls.avatar} />
                 <div className="Comment-CommentBody">
                     <a className="Comment-CommentUser" href={comment.user.urls.profile} target="_blank">{comment.user.name}</a>
@@ -103,7 +109,8 @@ const ThreadComments = React.createClass({
         dispatch:    React.PropTypes.func.isRequired,
         thread:      React.PropTypes.object.isRequired,
         comments:    React.PropTypes.array,
-        onNewThread: React.PropTypes.func.isRequired
+        onNewThread: React.PropTypes.func.isRequired,
+        onHide:      React.PropTypes.func
     },
 
     getInitialState() {
@@ -122,7 +129,7 @@ const ThreadComments = React.createClass({
     },
 
     render() {
-        const { dispatch, thread, comments, onNewThread } = this.props;
+        const { dispatch, thread, comments, onNewThread, onHide } = this.props;
         const { creatingComment } = this.state;
 
         const toolbarActions = [
@@ -148,7 +155,7 @@ const ThreadComments = React.createClass({
 
         return (
             <div>
-                <Comment comment={thread} />
+                <Comment comment={thread} onHide={onHide} />
                 <Comments comments={comments} />
             {creatingComment ?
                 <CommentForm thread={thread} dispatch={dispatch} onClose={this.closeForm} />

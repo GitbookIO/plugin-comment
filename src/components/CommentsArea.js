@@ -13,29 +13,57 @@ const CommentsArea = React.createClass({
 
     getInitialState() {
         return {
-            creatingThread: false
+            creatingThread: false,
+            readingThread:  null
         };
     },
 
+    // Close New Thread form
     closeForm() {
-        this.setState(this.getInitialState());
+        this.setState({
+            creatingThread: false
+        });
     },
 
+    // Open New Thread form
     openForm() {
         this.setState({
             creatingThread: true
         });
     },
 
+    // Close open thread
+    hideThread() {
+        this.setState({
+            readingThread: null
+        });
+    },
+
+    // Display a specific thread
+    showThread(number) {
+        this.setState({
+            readingThread: number
+        });
+    },
+
     render() {
         const { threads, sectionText } = this.props;
-        const { creatingThread } = this.state;
+        const { creatingThread, readingThread } = this.state;
 
-        const inner = creatingThread || !threads.length ?
+        const inner = (
+            // No existing thread or adding a new thread
+            creatingThread || !threads.length ?
             <NewThread sectionText={sectionText} onCloseForm={this.closeForm} withDiscardButton={threads.length > 0} /> :
+
+            // Access details about a thread
+            Boolean(readingThread) ?
+            <ThreadComments thread={threads.find(t => t.number == readingThread)} onNewThread={this.openForm} onHide={this.hideThread} /> :
+
+            // Display list of threads if more than one or details about the only existing thread
             threads.length > 1 ?
-            <ThreadsList threads={threads} onNewThread={this.openForm} /> :
-            <ThreadComments thread={threads[0]} onNewThread={this.openForm} />;
+            <ThreadsList threads={threads} onNewThread={this.openForm} onOpenThread={this.showThread} /> :
+            <ThreadComments thread={threads[0]} onNewThread={this.openForm} />
+        );
 
         return (
             <div className="Comment-CommentsArea">

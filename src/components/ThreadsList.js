@@ -5,13 +5,15 @@ const Toolbar = require('./Toolbar');
 
 const Thread = React.createClass({
     propTypes: {
-        thread: React.PropTypes.object.isRequired
+        thread: React.PropTypes.object.isRequired,
+        onOpen: React.PropTypes.func.isRequired
     },
 
     render() {
-        const { thread } = this.props;
+        const { thread, onOpen } = this.props;
+
         return (
-            <div className="Comment-Thread">
+            <div className="Comment-Thread" onClick={() => onOpen(thread.number)}>
                 <div className="Comment-ThreadTitle">
                     {thread.title}
                 </div>
@@ -25,12 +27,13 @@ const Thread = React.createClass({
 
 const ThreadsList = React.createClass({
     propTypes: {
-        threads:     React.PropTypes.array.isRequired,
-        onNewThread: React.PropTypes.func.isRequired
+        threads:      React.PropTypes.array.isRequired,
+        onNewThread:  React.PropTypes.func.isRequired,
+        onOpenThread: React.PropTypes.func.isRequired
     },
 
     render() {
-        const { threads, onNewThread } = this.props;
+        const { threads, onNewThread, onOpenThread } = this.props;
 
         const toolbarActions = [
             {
@@ -41,7 +44,7 @@ const ThreadsList = React.createClass({
 
         return (
             <div className="Comment-ThreadsList">
-                {threads.map((thread, i) => <Thread key={i} thread={thread} />)}
+                {threads.map((thread, i) => <Thread key={i} thread={thread} onOpen={onOpenThread} />)}
                 <Toolbar actions={toolbarActions} />
             </div>
         );
