@@ -53,7 +53,7 @@ const CommentsArea = React.createClass({
         const inner = (
             // No existing thread or adding a new thread
             creatingThread || !threads.length ?
-            <NewThread sectionText={sectionText} onCloseForm={this.closeForm} withDiscardButton={threads.length > 0} /> :
+            <NewThread sectionText={sectionText} onCloseForm={this.closeForm} withCloseButton={threads.length > 0} /> :
 
             // Access details about a thread
             Boolean(readingThread) ?

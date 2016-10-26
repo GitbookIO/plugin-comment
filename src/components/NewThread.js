@@ -1,17 +1,18 @@
 const GitBook   = require('gitbook-core');
 const { React } = GitBook;
 
-const Toolbar = require('./Toolbar');
-const actions = require('../actions');
+const CommentCloser = require('./CommentCloser');
+const Toolbar       = require('./Toolbar');
+const actions       = require('../actions');
 
 const NewThread = React.createClass({
     propTypes: {
-        dispatch:          React.PropTypes.func.isRequired,
-        filePath:          React.PropTypes.string.isRequired,
-        pageTitle:         React.PropTypes.string.isRequired,
-        sectionText:       React.PropTypes.string.isRequired,
-        onCloseForm:       React.PropTypes.func.isRequired,
-        withDiscardButton: React.PropTypes.bool.isRequired
+        dispatch:        React.PropTypes.func.isRequired,
+        filePath:        React.PropTypes.string.isRequired,
+        pageTitle:       React.PropTypes.string.isRequired,
+        sectionText:     React.PropTypes.string.isRequired,
+        onCloseForm:     React.PropTypes.func.isRequired,
+        withCloseButton: React.PropTypes.bool.isRequired
     },
 
     componentDidMount() {
@@ -44,7 +45,7 @@ const NewThread = React.createClass({
 
     render() {
         const { dispatch, pageTitle, filePath,
-            sectionText, onCloseForm, withDiscardButton } = this.props;
+            sectionText, onCloseForm, withCloseButton } = this.props;
         const { displayComment } = this.state;
 
         const toolbarActions = [
@@ -57,15 +58,12 @@ const NewThread = React.createClass({
             }
         ];
 
-        if (withDiscardButton) {
-            toolbarActions.push({
-                text: 'Discard',
-                onClick: onCloseForm
-            });
-        }
-
         return (
             <div className="Comment-NewThread">
+            {withCloseButton ?
+                <CommentCloser onClick={onCloseForm} />
+                : null
+            }
                 <input ref="titleInput" type="text" value={pageTitle} placeholder="Start a new discussion" onChange={this.onTitleChange} />
                 { displayComment ?
                     <input ref="commentInput" type="text" placeholder="Optional comment" onChange={this.onCommentChange} />
