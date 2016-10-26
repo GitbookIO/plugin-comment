@@ -5,15 +5,38 @@ const { List } = GitBook.Immutable;
 const Toolbar = require('./Toolbar');
 const actions = require('../actions');
 
-const Comments = React.createClass({
+const CommentForm = React.createClass({
     propTypes: {
-        comments: React.PropTypes.array
+        dispatch:  React.PropTypes.func.isRequired,
+        onDiscard: React.PropTypes.func.isRequired,
+        thread:    React.PropTypes.object.isRequired
+    },
+
+    componentDidMount() {
+        this.refs.bodyInput.focus();
     },
 
     render() {
-        return (
-            <div className="Comment-CommentsList">
+        const { dispatch, onDiscard, thread } = this.props;
+        const toolbarActions = [
+            {
+                text: 'Post',
+                onClick: () => {
+                    dispatch(actions.postComment(thread.number, this.refs.bodyInput.value));
+                }
+            },
+            {
+                text: 'Discard',
+                onClick: () => {
+                    onDiscard();
+                }
+            }
+        ];
 
+        return (
+            <div className="Comment-NewThreadComment">
+                <input ref="bodyInput" type="text" placeholder="Leave a comment" />
+                <Toolbar actions={toolbarActions} />
             </div>
         );
     }
@@ -59,11 +82,38 @@ const Comment = React.createClass({
     }
 });
 
+const Comments = React.createClass({
+    propTypes: {
+        comments: React.PropTypes.array
+    },
+
+    render() {
+        const { comments } = this.props;
+
+        return (
+            <div className="Comment-CommentsList">
+                {comments.map((comment, i) => <Comment key={i} comment={comment} />)}
+            </div>
+        );
+    }
+});
+
 const ThreadComments = React.createClass({
     propTypes: {
-        dispatch: React.PropTypes.func.isRequired,
-        thread:   React.PropTypes.object.isRequired,
-        comments: React.PropTypes.array
+        dispatch:    React.PropTypes.func.isRequired,
+        thread:      React.PropTypes.object.isRequired,
+        comments:    React.PropTypes.array,
+        sectionText: React.PropTypes.string.isRequired
+    },
+
+    getInitialState() {
+        return {
+            creatingComment: false
+        };
+    },
+
+    closeForm() {
+        return this.setState(this.getInitialState());
     },
 
     componentDidMount() {
@@ -73,11 +123,16 @@ const ThreadComments = React.createClass({
 
     render() {
         const { dispatch, thread, comments } = this.props;
+        const { creatingComment } = this.state;
 
         const toolbarActions = [
             {
                 text: 'Comment',
-                onClick: () => {}
+                onClick: () => {
+                    this.setState({
+                        creatingComment: true
+                    });
+                }
             },
             {
                 text: 'Close',
@@ -95,7 +150,11 @@ const ThreadComments = React.createClass({
             <div>
                 <Comment comment={thread} />
                 <Comments comments={comments} />
+            {creatingComment ?
+                <CommentForm thread={thread} dispatch={dispatch} onDiscard={this.closeForm} />
+                :
                 <Toolbar actions={toolbarActions} />
+            }
             </div>
         );
     }
