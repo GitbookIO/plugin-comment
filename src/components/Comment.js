@@ -3,7 +3,8 @@ const GitBook    = require('gitbook-core');
 const { React }  = GitBook;
 const classNames = require('classnames');
 
-const actions        = require('../actions');
+const CommentsArea = require('./CommentsArea');
+const actions      = require('../actions');
 
 // Unique Id for CommentSection components
 let uniqueId = 0;
