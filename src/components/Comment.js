@@ -3,9 +3,6 @@ const GitBook    = require('gitbook-core');
 const { React }  = GitBook;
 const classNames = require('classnames');
 
-const NewThread      = require('./NewThread');
-const ThreadsList    = require('./ThreadsList');
-const ThreadComments = require('./ThreadComments');
 const actions        = require('../actions');
 
 // Unique Id for CommentSection components
@@ -21,46 +18,6 @@ function getNbComments(threads) {
         return total + thread.comments + 1;
     }, 0);
 }
-
-const CommentsArea = React.createClass({
-    propTypes: {
-        threads:     React.PropTypes.array.isRequired,
-        sectionText: React.PropTypes.string.isRequired
-    },
-
-    getInitialState() {
-        return {
-            creatingThread: false
-        };
-    },
-
-    closeForm() {
-        this.setState(this.getInitialState());
-    },
-
-    openForm() {
-        this.setState({
-            creatingThread: true
-        });
-    },
-
-    render() {
-        const { threads, sectionText } = this.props;
-        const { creatingThread } = this.state;
-
-        const inner = creatingThread || !threads.length ?
-            <NewThread sectionText={sectionText} onCloseForm={this.closeForm} /> :
-            threads.length > 1 ?
-            <ThreadsList threads={threads} onNewThread={this.openForm} /> :
-            <ThreadComments thread={threads[0]} onNewThread={this.openForm} />;
-
-        return (
-            <div className="Comment-CommentsArea">
-                {inner}
-            </div>
-        );
-    }
-});
 
 const Marker = React.createClass({
     propTypes: {
