@@ -4,6 +4,7 @@ const { React }  = GitBook;
 const classNames = require('classnames');
 
 const NewThread      = require('./NewThread');
+const ThreadsList    = require('./ThreadsList');
 const ThreadComments = require('./ThreadComments');
 const actions        = require('../actions');
 
@@ -21,55 +22,37 @@ function getNbComments(threads) {
     }, 0);
 }
 
-const Thread = React.createClass({
-    propTypes: {
-        thread: React.PropTypes.object.isRequired
-    },
-
-    render() {
-        const { thread } = this.props;
-        return (
-            <div className="Comment-Thread">
-                <div className="Comment-ThreadTitle">
-                    {thread.title}
-                </div>
-                <div className="Comment-ThreadUser">
-                    {`#${thread.number} posted by ${thread.user.name}`}
-                </div>
-            </div>
-        );
-    }
-});
-
-const ThreadsList = React.createClass({
-    propTypes: {
-        threads: React.PropTypes.array.isRequired
-    },
-
-    render() {
-        const { threads } = this.props;
-        return (
-            <div className="Comment-ThreadsList">
-                { threads.map((thread, i) => <Thread key={i} thread={thread} />) }
-            </div>
-        );
-    }
-});
-
 const CommentsArea = React.createClass({
     propTypes: {
         threads:     React.PropTypes.array.isRequired,
         sectionText: React.PropTypes.string.isRequired
     },
 
+    getInitialState() {
+        return {
+            creatingThread: false
+        };
+    },
+
+    closeForm() {
+        this.setState(this.getInitialState());
+    },
+
+    openForm() {
+        this.setState({
+            creatingThread: true
+        });
+    },
+
     render() {
         const { threads, sectionText } = this.props;
+        const { creatingThread } = this.state;
 
-        const inner = threads.length > 1 ?
-            <ThreadsList threads={threads} /> :
-            threads.length == 1 ?
-            <ThreadComments thread={threads[0]} /> :
-            <NewThread sectionText={sectionText} />;
+        const inner = creatingThread || !threads.length ?
+            <NewThread sectionText={sectionText} onCloseForm={this.closeForm} /> :
+            threads.length > 1 ?
+            <ThreadsList threads={threads} onNewThread={this.openForm} /> :
+            <ThreadComments thread={threads[0]} onNewThread={this.openForm} />;
 
         return (
             <div className="Comment-CommentsArea">
@@ -92,7 +75,7 @@ const Marker = React.createClass({
         return (
             <div className="Comment-Icon" onClick={onClick}>
                 <div className="Comment-Marker">
-                    { nbComments > 0 ? nbComments : '+' }
+                    {nbComments > 0 ? nbComments : '+'}
                 </div>
             </div>
         );
@@ -140,9 +123,10 @@ const CommentSection = React.createClass({
         return (
             <div className={className}>
                 { children }
-            { isOpen ?
+            {isOpen ?
                 <CommentsArea threads={threads} sectionText={sectionText} />
-                : null }
+                : null
+            }
                 <Marker threads={threads} onClick={this.toggleArea} />
             </div>
         );

@@ -102,7 +102,8 @@ const ThreadComments = React.createClass({
     propTypes: {
         dispatch:    React.PropTypes.func.isRequired,
         thread:      React.PropTypes.object.isRequired,
-        comments:    React.PropTypes.array
+        comments:    React.PropTypes.array,
+        onNewThread: React.PropTypes.func.isRequired
     },
 
     getInitialState() {
@@ -112,7 +113,7 @@ const ThreadComments = React.createClass({
     },
 
     closeForm() {
-        return this.setState(this.getInitialState());
+        this.setState(this.getInitialState());
     },
 
     componentDidMount() {
@@ -121,7 +122,7 @@ const ThreadComments = React.createClass({
     },
 
     render() {
-        const { dispatch, thread, comments } = this.props;
+        const { dispatch, thread, comments, onNewThread } = this.props;
         const { creatingComment } = this.state;
 
         const toolbarActions = [
@@ -141,7 +142,7 @@ const ThreadComments = React.createClass({
             },
             {
                 text: 'New Thread',
-                onClick: () => {}
+                onClick: onNewThread
             }
         ];
 

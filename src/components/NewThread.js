@@ -9,7 +9,8 @@ const NewThread = React.createClass({
         dispatch:    React.PropTypes.func.isRequired,
         filePath:    React.PropTypes.string.isRequired,
         pageTitle:   React.PropTypes.string.isRequired,
-        sectionText: React.PropTypes.string.isRequired
+        sectionText: React.PropTypes.string.isRequired,
+        onCloseForm: React.PropTypes.func.isRequired
     },
 
     componentDidMount() {
@@ -41,15 +42,20 @@ const NewThread = React.createClass({
     },
 
     render() {
-        const { dispatch, pageTitle, filePath, sectionText } = this.props;
+        const { dispatch, pageTitle, filePath, sectionText, onCloseForm } = this.props;
         const { displayComment } = this.state;
 
         const toolbarActions = [
             {
                 text: 'Post',
                 onClick: () => {
-                    dispatch(actions.postThread(this.refs.titleInput.value, this.refs.commentInput.value, pageTitle, filePath, sectionText));
+                    dispatch(actions.postThread(this.refs.titleInput.value, this.refs.commentInput.value, pageTitle, filePath, sectionText))
+                    .then(onCloseForm);
                 }
+            },
+            {
+                text: 'Discard',
+                onClick: onCloseForm
             }
         ];
 
