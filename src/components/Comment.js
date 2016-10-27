@@ -23,12 +23,13 @@ function getNbComments(threads) {
 
 const Marker = React.createClass({
     propTypes: {
-        threads: React.PropTypes.array.isRequired,
-        onClick: React.PropTypes.func.isRequired
+        threads:   React.PropTypes.array.isRequired,
+        onClick:   React.PropTypes.func.isRequired,
+        sectionId: React.PropTypes.number.isRequired
     },
 
     render() {
-        const { threads, onClick } = this.props;
+        const { threads, onClick, sectionId } = this.props;
         const nbComments = getNbComments(threads);
 
         const users = threads.map(thread => thread.user)
@@ -37,7 +38,7 @@ const Marker = React.createClass({
         return (
             <div className="Comment-Icon" onClick={onClick}>
             {nbComments > 0 ?
-                <AvatarsIcon users={users} />
+                <AvatarsIcon users={users} sectionId={sectionId} />
                 :
                 <div className="Comment-Marker">+</div>
             }
@@ -91,7 +92,7 @@ const CommentSection = React.createClass({
                 <CommentsArea threads={threads} sectionText={sectionText} />
                 : null
             }
-                <Marker threads={threads} onClick={this.toggleArea} />
+                <Marker threads={threads} onClick={this.toggleArea} sectionId={this.uniqueId} />
             </div>
         );
     }

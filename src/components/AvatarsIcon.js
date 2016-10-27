@@ -3,12 +3,13 @@ const { React, Tooltipped } = GitBook;
 
 const AvatarsIcon = React.createClass({
     propTypes: {
-        users:    React.PropTypes.array.isRequired,
-        openArea: React.PropTypes.number
+        users:     React.PropTypes.array.isRequired,
+        openArea:  React.PropTypes.number,
+        sectionId: React.PropTypes.number.isRequired
     },
 
     render() {
-        const { users, openArea } = this.props;
+        const { users, openArea, sectionId } = this.props;
         const displayedUsers = users.slice(0, 3);
 
         const usernames = displayedUsers.map(user => user.username).join(', ');
@@ -16,7 +17,7 @@ const AvatarsIcon = React.createClass({
 
         const tooltipTitle = `${usernames} ${countOthers > 0 ? `and ${countOthers} other people` : ''}`;
 
-        if (!openArea) {
+        if (!openArea || (openArea != sectionId)) {
             return (
                 <div className="Comment-Avatars">
                     <Tooltipped title={tooltipTitle}>
