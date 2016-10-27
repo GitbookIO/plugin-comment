@@ -42,10 +42,10 @@ function apiRequest(method, route, data, errorType, dispatch) {
     return fetch(apiURL, options)
     .then((response) => {
         if (response.status >= 200 && response.status < 300) {
-            const loggedIn = Boolean(response.headers.get('X-GitBook-Auth'));
+            const username = response.headers.get('X-GitBook-Auth') || null;
             dispatch({
                 type: ACTIONS_TYPES.USER_STATUS_UPDATE,
-                loggedIn
+                username
             });
         }
         else {
@@ -232,18 +232,6 @@ function postComment(number, body) {
 }
 
 /**
- * Update user logged in status
- * @param  {Boolean} loggedIn
- * @return {Action}
- */
-function updateUserStatus(loggedIn) {
-    return {
-        type: ACTIONS_TYPES.USER_STATUS_UPDATE,
-        loggedIn
-    };
-}
-
-/**
  * Update currently open comments area id
  * @param  {Number} uniqueId
  * @return {Action}
@@ -271,7 +259,6 @@ module.exports = {
     closeThread,
     fetchComments,
     postComment,
-    updateUserStatus,
     openArea,
     closeArea
 };

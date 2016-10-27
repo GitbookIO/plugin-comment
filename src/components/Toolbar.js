@@ -6,14 +6,14 @@ const getApiURL = require('../utils/getApiURL');
 const Toolbar = React.createClass({
     propTypes: {
         actions:  React.PropTypes.array,
-        loggedIn: React.PropTypes.bool.isRequired
+        username: React.PropTypes.string
     },
 
     render() {
         let toolbarActions = this.props.actions;
-        const { loggedIn } = this.props;
+        const { username } = this.props;
 
-        if (!loggedIn) {
+        if (!username) {
             toolbarActions = [
                 {
                     text: 'Sign in to GitBook.com',
@@ -46,7 +46,7 @@ const Toolbar = React.createClass({
 
 function mapStateToProps({ comment }) {
     return {
-        loggedIn: comment.get('loggedIn')
+        username: comment.get('username')
     };
 }
 
