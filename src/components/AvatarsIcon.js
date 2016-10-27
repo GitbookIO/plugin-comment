@@ -15,7 +15,7 @@ const AvatarsIcon = React.createClass({
         const usernames = displayedUsers.map(user => user.username).join(', ');
         const countOthers = users.length - displayedUsers.length;
 
-        const tooltipTitle = `${usernames} ${countOthers > 0 ? `and ${countOthers} other people` : ''}`;
+        const tooltipTitle = `${usernames} ${countOthers > 0 ? `and ${countOthers} other${countOthers > 1 ? 's' : ''}` : ''}`;
 
         if (!openArea || (openArea != sectionId)) {
             return (
