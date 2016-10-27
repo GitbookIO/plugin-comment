@@ -16,7 +16,7 @@ const NewThread = React.createClass({
     },
 
     componentDidMount() {
-        this.refs.commentInput.focus();
+        this.refs.titleInput.select();
     },
 
     getInitialState() {
@@ -64,7 +64,7 @@ const NewThread = React.createClass({
                 <CommentCloser onClick={onCloseForm} />
                 : null
             }
-                <input ref="titleInput" type="text" value={pageTitle} placeholder="Start a new discussion" onChange={this.onTitleChange} />
+                <input ref="titleInput" type="text" defaultValue={pageTitle} placeholder="Start a new discussion" onChange={this.onTitleChange} />
                 { displayComment ?
                     <input ref="commentInput" type="text" placeholder="Optional comment" onChange={this.onCommentChange} />
                     : null }
