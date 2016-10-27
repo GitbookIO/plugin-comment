@@ -32,7 +32,7 @@
         opacity: 0.7;
         height: 16px;
         text-align: center;
-        background-color: #999;
+        background-color: #666;
         border-radius: 100%;
         padding: 2px;
         color: white;
@@ -55,6 +55,13 @@
             top: 0;
             .flex-display();
             .flex-direction(row-reverse);
+
+            /* Display tooltip without breaking children elements flow */
+            .GitBook-Tooltipped {
+                .flex-display();
+                .flex-direction(row-reverse);
+
+            }
 
             .Comment-Avatar {
                 .flex(auto);
