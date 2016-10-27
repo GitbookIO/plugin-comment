@@ -1,9 +1,17 @@
+@import "./flex.less";
+
 @comments-area-width: 240px;
 @comments-icon-width: 24px;
-@comments-icon-margin: 20px;
+@comments-icon-margin: 30px;
 @comments-column-width: (2*@comments-icon-margin + @comments-icon-width + @comments-area-width);
 
 @border-color: rgba(0, 0, 0, 0.07);
+@comments-icon-border-radius: 3px;
+
+@avatar-icon-border: 2px solid white;
+@avatar-icon-border-radius: 100%;
+@avatar-icon-margin-right: -14px;
+@avatar-icon-width: 30px;
 
 @avatar-size: 24px;
 
@@ -40,6 +48,33 @@
         bottom: 0px;
         width: (@comments-icon-width + 2*@comments-icon-margin);
 
+        .Comment-Avatars {
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 0;
+            .flex-display();
+            .flex-direction(row-reverse);
+
+            .Comment-Avatar {
+                .flex(auto);
+                width: @avatar-icon-width;
+                background-color: white;
+                border: @avatar-icon-border;
+                border-radius: @avatar-icon-border-radius;
+                margin-right: @avatar-icon-margin-right;
+                transition: 0.5s opacity;
+
+                &:first-of-type {
+                    margin-right: 0;
+                }
+
+                img {
+                    border-radius: @avatar-icon-border-radius;
+                }
+            }
+        }
+
         .Comment-Marker {
             background: #eee;
             padding: 4px;
@@ -50,7 +85,7 @@
             height: @comments-icon-width;
             line-height: (@comments-icon-width - 8);
             text-align: center;
-            border-radius: 3px;
+            border-radius: @comments-icon-border-radius;
             color: #555;
             user-select: none;
             -webkit-user-select: none;
@@ -191,6 +226,10 @@
 
         .Comment-Icon {
             display: block;
+
+            .Comment-Avatars {
+                opacity: 0.5;
+            }
 
             .Comment-Marker {
                 background-image: @highlight-background;

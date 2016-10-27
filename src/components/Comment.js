@@ -20,6 +20,28 @@ function getNbComments(threads) {
     }, 0);
 }
 
+const Avatars = React.createClass({
+    propTypes: {
+        users: React.PropTypes.array.isRequired
+    },
+
+    render() {
+        const { users } = this.props;
+
+        return (
+            <div className="Comment-Avatars">
+                {users.map((user, i) => {
+                    return (
+                        <div key={i} className="Comment-Avatar">
+                            <img src={user.urls.avatar} />
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    }
+});
+
 const Marker = React.createClass({
     propTypes: {
         threads: React.PropTypes.array.isRequired,
@@ -30,11 +52,16 @@ const Marker = React.createClass({
         const { threads, onClick } = this.props;
         const nbComments = getNbComments(threads);
 
+        const users = threads.map(thread => thread.user)
+            .filter((user, i, arr) => arr.indexOf(user) == i);
+
         return (
             <div className="Comment-Icon" onClick={onClick}>
-                <div className="Comment-Marker">
-                    {nbComments > 0 ? nbComments : '+'}
-                </div>
+            {nbComments > 0 ?
+                <Avatars users={users} />
+                :
+                <div className="Comment-Marker">+</div>
+            }
             </div>
         );
     }
