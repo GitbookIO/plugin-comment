@@ -43,7 +43,7 @@
         position: absolute;
         display: none;
         z-index: 1;
-        right: -2*@comments-icon-margin;
+        right: -80px;
         top: 0px;
         bottom: 0px;
         width: (@comments-icon-width + 2*@comments-icon-margin);
@@ -70,7 +70,8 @@
                 border: @avatar-icon-border;
                 border-radius: @avatar-icon-border-radius;
                 margin-right: @avatar-icon-margin-right;
-                transition: 0.5s opacity;
+                transition: 0.5s opacity ease;
+                transition: 0.5s margin-right ease;
 
                 &:first-of-type {
                     margin-right: 0;
@@ -78,6 +79,12 @@
 
                 img {
                     border-radius: @avatar-icon-border-radius;
+                }
+            }
+
+            &:hover {
+                .Comment-Avatar {
+                    margin-right: 0;
                 }
             }
         }
