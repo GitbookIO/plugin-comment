@@ -16,7 +16,7 @@ const CommentCloser = React.createClass({
     render() {
         return (
             <div className="Comment-Closer" onClick={this.onClick} >
-                <i className="fa fa-times" />
+                <i className="fa fa-arrow-left" />
             </div>
         );
     }
